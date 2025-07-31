@@ -1,0 +1,16 @@
+{
+  "name": "covalent",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "npm run build -w @covalent/common && npm run build -w @covalent/core && npm run build -w @covalent/render",
+    "test": "npm run test -w @covalent/core && npm run test -w @covalent/render",
+    "coverage": "npm run coverage -w @covalent/core && npm run coverage -w @covalent/render",
+    "release": "npm run build && changeset publish"
+  },
+  "devDependencies": {
+    "@changesets/cli": "^2.29.5"
+  }
+}

@@ -1,0 +1,38 @@
+{
+  "name": "@covalent/render",
+  "version": "1.0.0",
+  "description": "Covalent library for Angular render-side",
+  "repository": "https://github.com/math-cheveux/electron-covalent",
+  "keywords": [
+    "electron",
+    "ipc"
+  ],
+  "license": "MIT",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "clean": "rimraf ./dist/",
+    "wipe": "npm run clean && rimraf node_modules",
+    "init": "npm run wipe && npm install",
+    "build": "tsup",
+    "watch": "tsup --watch"
+  },
+  "dependencies": {
+    "@covalent/common": "^1.0.0"
+  },
+  "peerDependencies": {
+    "electron": "*",
+    "rxjs": "^7.8.1"
+  },
+  "devDependencies": {
+    "rimraf": "6.0.1",
+    "tslib": "2.6.3",
+    "tsup": "^8.5.0",
+    "typescript": "5.5.4",
+    "vitest": "^3.2.4"
+  }
+}

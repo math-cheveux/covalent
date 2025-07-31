@@ -1,0 +1,33 @@
+{
+  "name": "@covalent/common",
+  "version": "1.0.0",
+  "description": "Shared types of the Covalent library",
+  "repository": "https://github.com/math-cheveux/covalent",
+  "keywords": [
+    "electron",
+    "ipc"
+  ],
+  "license": "MIT",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "clean": "rimraf ./dist/",
+    "wipe": "npm run clean && rimraf node_modules",
+    "init": "npm run wipe && npm install",
+    "build": "tsup",
+    "watch": "tsup --watch"
+  },
+  "devDependencies": {
+    "@types/node": "22.5.0",
+    "rimraf": "6.0.1",
+    "tsup": "^8.5.0",
+    "typescript": "5.5.4"
+  },
+  "peerDependencies": {
+    "electron": "*"
+  }
+}

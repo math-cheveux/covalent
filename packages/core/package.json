@@ -1,0 +1,42 @@
+{
+  "name": "@covalent/core",
+  "version": "1.0.0",
+  "description": "Covalent library for electron-side",
+  "repository": "https://github.com/math-cheveux/electron-covalent",
+  "keywords": [
+    "electron",
+    "ipc"
+  ],
+  "license": "MIT",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "clean": "rimraf ./dist/",
+    "wipe": "npm run clean && rimraf node_modules",
+    "init": "npm run wipe && npm install",
+    "build": "tsup",
+    "watch": "tsup --watch",
+    "test": "vitest",
+    "coverage": "vitest run --coverage"
+  },
+  "dependencies": {
+    "@covalent/common": "^1.0.0"
+  },
+  "peerDependencies": {
+    "electron": "*",
+    "reflect-metadata": "^0.2.2",
+    "rxjs": "^7.8.1"
+  },
+  "devDependencies": {
+    "@types/node": "22.5.0",
+    "rimraf": "6.0.1",
+    "tslib": "2.6.3",
+    "tsup": "^8.5.0",
+    "typescript": "5.5.4",
+    "vitest": "^3.2.4"
+  }
+}

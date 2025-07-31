@@ -1,0 +1,15 @@
+# IntelliJ project files
+.idea
+*.iml
+out
+gen
+
+# compiled output
+dist/
+
+# dependencies
+node_modules/
+
+# System Files
+.DS_Store/
+
