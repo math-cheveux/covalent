@@ -4,11 +4,11 @@ Covalent is a TypeScript library which encapsulates and facilitates inter-proces
 backend and its frontends.
 This library was thought for Angular render processes, but it can be used for other project types.
 
-In Covalent, Electron is the master: the backend exposes its features to the render processes, the _controllers_ classes
+In Covalent, Electron is the master: the backend exposes its features to the render processes, the _controller_ classes
 expose their functions.
-On the render side, each controller is associated with one (or several) class, called _proxy_, to provide the
-controllers features to the front.
-The controllers and their proxys share an interface, called _bridge_, that defines the functions exposed by controllers.
+On the render side, each controller is associated with one (or several) _proxy_ class to provide the controllers'
+features to the front.
+Controllers and their proxies share a _bridge_ interface that defines the functions exposed by controllers.
 
 ## Communication types
 
@@ -252,7 +252,7 @@ export class ExampleProxy {
 endpoints.
 
 Since render processes could be executed in a non-Electron context, a default function/observable should be defined for
-proxies mapped members.
+proxy mapped members.
 The utility class `Bridges.Default` must be used in these cases (defining an observable is right for `ON` endpoints).
 `Bridges.Default.Invoke` and `Bridges.Default.Callback` takes an optional parameter: it will define the value returned
 by default.
