@@ -135,6 +135,11 @@ export class Controllers {
     return [];
   }
 
+  /**
+   * Move one item in the provided array to respect the construction order.
+   * @param providers the array to re-order
+   * @return <code>true</code> if the array has been changed, otherwise <code>false</code>
+   */
   private static forwardFirstDependency(providers: Provider[]): boolean {
     for (let i = 0; i < providers.length; i++) {
       const provider = providers[i];
@@ -157,6 +162,10 @@ export class Controllers {
     return false;
   }
 
+  /**
+   * Instantiate the provided controllers, and then run their initialization method.
+   * @param providers the controllers to initialize
+   */
   private static async init(providers: Provider[]) {
     for (const provider of providers) {
       if (!this._controllers.has(provider.provide.name)) {
@@ -188,7 +197,11 @@ export class Controllers {
    * If the controller is not initialized yet, it will wait until it is.
    */
   public static get<T extends Object>(controller: Constructor<T>): Promise<T> {
-    return new Promise(resolve => {
+    return new Promise((resolve, reject) => {
+      if (!this._controllersInit.has(controller.name)) {
+        reject(new Error(`Controller ${controller.name} is not registered.`));
+        return;
+      }
       this._controllersInit.get(controller.name)!
         .pipe(first(value => value))
         .subscribe(() => resolve(this.getSync(controller)));
@@ -230,6 +243,14 @@ export class Controllers {
       groupController[group] = construct.name;
     });
     contextBridge.exposeInMainWorld(this.EXPOSE_KEY, bridge);
+  }
+
+  public static dispose() {
+    this._controllers.clear();
+    for (const subject of this._controllersInit.values()) {
+      subject.complete();
+    }
+    this._controllersInit.clear();
   }
 }
 

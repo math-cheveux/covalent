@@ -16,23 +16,27 @@
   ],
   "scripts": {
     "clean": "rimraf ./dist/",
-    "wipe": "npm run clean && rimraf node_modules",
-    "init": "npm run wipe && npm install",
     "build": "tsup",
-    "watch": "tsup --watch"
+    "watch": "tsup --watch",
+    "test": "jest"
   },
   "dependencies": {
     "@covalent/common": "^1.0.0"
   },
   "peerDependencies": {
     "electron": "*",
+    "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1"
   },
   "devDependencies": {
+    "@types/jest": "^30.0.0",
+    "jest": "^30.0.5",
+    "jest-environment-jsdom": "^30.0.5",
     "rimraf": "6.0.1",
+    "ts-jest": "^29.4.0",
+    "ts-node": "^10.9.2",
     "tslib": "2.6.3",
     "tsup": "^8.5.0",
-    "typescript": "5.5.4",
-    "vitest": "^3.2.4"
+    "typescript": "5.5.4"
   }
 }

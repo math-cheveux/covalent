@@ -16,8 +16,6 @@
   ],
   "scripts": {
     "clean": "rimraf ./dist/",
-    "wipe": "npm run clean && rimraf node_modules",
-    "init": "npm run wipe && npm install",
     "build": "tsup",
     "watch": "tsup --watch"
   },

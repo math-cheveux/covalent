@@ -185,7 +185,7 @@ export abstract class Bridges {
    * Reset the stored-value of an overridden `INVOKE` function.
    * @param fn the overridden function to reset
    */
-  public static invalidateCache(fn: Bridge.Invoke<CovalentData, CovalentData>) {
+  public static invalidateCache<Input extends CovalentData, Output extends CovalentData>(fn: Bridge.Invoke<Input, Output>) {
     this.CACHE_MAP.get(fn)?.clear();
   }
 

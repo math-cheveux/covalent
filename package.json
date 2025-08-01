@@ -5,12 +5,16 @@
     "packages/*"
   ],
   "scripts": {
+    "clean": "npm run clean -w @covalent/common && npm run clean -w @covalent/core && npm run clean -w @covalent/render",
+    "wipe": "npm run clean && rimraf node_modules packages/core/node_modules packages/render/node_modules package-lock.json",
+    "init": "npm run wipe && npm install",
     "build": "npm run build -w @covalent/common && npm run build -w @covalent/core && npm run build -w @covalent/render",
     "test": "npm run test -w @covalent/core && npm run test -w @covalent/render",
     "coverage": "npm run coverage -w @covalent/core && npm run coverage -w @covalent/render",
     "release": "npm run build && changeset publish"
   },
   "devDependencies": {
-    "@changesets/cli": "^2.29.5"
+    "@changesets/cli": "^2.29.5",
+    "rimraf": "6.0.1"
   }
 }
