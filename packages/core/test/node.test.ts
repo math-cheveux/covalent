@@ -184,42 +184,46 @@ describe("electron-side", () => {
     expect(closeSpy).toHaveBeenCalled();
   });
 
-  test("should detect callback closing from render", () => {
-    const closeListeners: (() => void)[] = [];
-    const port: CallbackPort<number, number> = {
-      id: 0,
-      input: 1,
-      postMessage: jest.fn().mockName("port:post"),
-      close: jest.fn(),
-      onClose: jest.fn((listener) => closeListeners.push(listener)),
-    };
+  test("should detect callback closing from render", async () => {
+    return new Promise<void>(resolve => {
+      const closeListeners: (() => void)[] = [];
+      const port: CallbackPort<number, number> = {
+        id: 0,
+        input: 1,
+        postMessage: jest.fn().mockName("port:post"),
+        close: jest.fn(),
+        onClose: jest.fn((listener) => closeListeners.push(listener)),
+      };
 
-    let closed = false;
-    function watchLoop(subject: CallbackSubject<number>, input: number) {
-      if (subject.closed) {
-        closed = true;
-        return;
+      let closed = false;
+      function watchLoop(subject: CallbackSubject<number>, input: number) {
+        if (subject.closed) {
+          closed = true;
+          return;
+        }
+        subject.next(input);
+        setTimeout(() => watchLoop(subject, 2*input), 100);
       }
-      subject.next(input);
-      setTimeout(() => watchLoop(subject, 2*input), 100);
-    }
 
 
-    const postSpy = jest.spyOn(port, "postMessage");
+      const postSpy = jest.spyOn(port, "postMessage");
 
-    const manager = new CallbackManager<number, number>("test", watchLoop);
-    manager.watch(port);
+      const manager = new CallbackManager<number, number>("test", watchLoop);
+      manager.watch(port);
 
-    expect(postSpy).toHaveBeenCalledTimes(1);
-    setTimeout(() => {
-      expect(postSpy).toHaveBeenCalledTimes(2);
-      expect(closed).toBeFalsy();
-      closeListeners.forEach(listener => listener());
+      expect(postSpy).toHaveBeenCalledTimes(1);
       setTimeout(() => {
         expect(postSpy).toHaveBeenCalledTimes(2);
-        expect(closed).toBeTruthy();
-      }, 100);
-    }, 150);
+        expect(closed).toBeFalsy();
+        closeListeners.forEach(listener => listener());
+        setTimeout(() => {
+          expect(postSpy).toHaveBeenCalledTimes(2);
+          expect(closed).toBeTruthy();
+          resolve();
+        }, 100);
+      }, 150);
+    });
+
   });
 
   test("should accept multiple registration", async () => {
