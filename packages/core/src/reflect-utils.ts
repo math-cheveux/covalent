@@ -8,5 +8,6 @@ export abstract class ReflectUtils {
     return value;
   }
 
+  /* istanbul ignore next */
   private constructor() {}
 }
