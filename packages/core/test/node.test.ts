@@ -1,5 +1,11 @@
-import { CallbackManager, CallbackPort, Controller, Controllers, OnInit } from "../src";
+import { CallbackManager, CallbackPort, Controller, Controllers, OnInit, WebContents } from "../src";
 import { ExampleController, LogController } from "./test-interfaces";
+
+const wc = {
+  isDestroyed: jest.fn(() => false),
+  isCrashed: jest.fn(() => false),
+  send: jest.fn().mockName("webContent.send"),
+};
 
 jest.mock("electron", () => ({
   ipcRenderer: {
@@ -11,7 +17,7 @@ jest.mock("electron", () => ({
     handle: jest.fn(),
   },
   webContents: {
-    getAllWebContents: jest.fn(() => []),
+    getAllWebContents: jest.fn(() => [wc]),
   },
 }));
 
@@ -145,4 +151,12 @@ describe("electron-side", () => {
     await expect(Controllers.get(LogController)).resolves.toBeDefined();
     await expect(Controllers.get(ExampleController)).resolves.toBeDefined();
   })
+
+  test("should broadcast message on channel", () => {
+    const sendSpy = jest.spyOn(wc, "send");
+
+    expect(sendSpy).not.toHaveBeenCalled();
+    WebContents.send("test", 14, 42);
+    expect(sendSpy).toHaveBeenCalledWith("test", 14, 42);
+  });
 });
