@@ -11,11 +11,12 @@
     "build": "npm run build -w @covalent/common && npm run build -w @covalent/core && npm run build -w @covalent/render",
     "test:core": "npm run test -w @covalent/core && lcov-result-merger 'packages/**/coverage/lcov.info' > coverage/lcov.info",
     "test:render": "npm run test -w @covalent/render && lcov-result-merger 'packages/**/coverage/lcov.info' > coverage/lcov.info",
-    "release": "npm run build && changeset publish"
+    "release": "npm run init && npm run build && npm run test:core && npm run test:render && pnpm -r publish --access public"
   },
   "devDependencies": {
     "@changesets/cli": "^2.29.5",
     "lcov-result-merger": "^5.0.1",
+    "pnpm": "^10.14.0",
     "rimraf": "6.0.1"
   }
 }

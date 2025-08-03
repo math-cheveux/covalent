@@ -1,3 +1,6 @@
+[![npm version](https://img.shields.io/npm/v/@covalent/common)](https://www.npmjs.com/package/@covalent/common)
+[![npm version](https://img.shields.io/npm/v/@covalent/core)](https://www.npmjs.com/package/@covalent/core)
+[![npm version](https://img.shields.io/npm/v/@covalent/render)](https://www.npmjs.com/package/@covalent/render)
 [![Coverage](https://github.com/math-cheveux/covalent/actions/workflows/coverage.yml/badge.svg)](https://github.com/math-cheveux/covalent/actions/workflows/coverage.yml)
 
 # Introduction
