@@ -12,6 +12,7 @@ export interface ExampleBridge {
   doAction: Bridge.Send<string>;
   getConfig: Bridge.Invoke<void, { url: string }>;
   calculate: Bridge.Invoke<{ x: number }, number>;
+  getDate: Bridge.Invoke<void, Date>;
   onDate: Bridge.On<Date>;
   onClick: Bridge.On<ClickEvent>;
   watchMetrics: Bridge.Callback<{ period: number }, { percentCpuUsage: number }>;
@@ -27,10 +28,10 @@ export class LogProxy {
 
 @Proxy<ExampleProxy, ExampleBridge>({
   group: "example",
-  mirror: ["doAction", "calculate"],
+  mirror: ["doAction", "calculate", "getDate"],
   map: (bridge) => ({
     getConfiguration: Bridges.cache(bridge.getConfig),
-    date$: Bridges.of(bridge.onDate),
+    date$: Bridges.of(bridge.onDate, { init: bridge.getDate }),
     click$: Bridges.of(bridge.onClick),
     watch: Bridges.open(bridge, "watchMetrics"),
   }),
@@ -39,6 +40,7 @@ export class ExampleProxy {
   public readonly doAction: ExampleBridge["doAction"] = Bridges.Default.Send();
   public readonly getConfiguration: ExampleBridge["getConfig"] = Bridges.Default.Invoke({ url: "/" });
   public readonly calculate: ExampleBridge["calculate"] = Bridges.Default.Invoke(NaN);
+  public readonly getDate: ExampleBridge["getDate"] = Bridges.Default.Invoke(new Date());
   public readonly date$: BridgeOf<ExampleBridge["onDate"]> = interval(250).pipe(map(() => new Date()));
   public readonly click$: BridgeOf<ExampleBridge["onClick"]> = EMPTY;
   public readonly watch: BridgeOpen<ExampleBridge["watchMetrics"]> = Bridges.Default.Callback({ percentCpuUsage: NaN });

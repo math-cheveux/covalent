@@ -6,6 +6,11 @@ afterEach(() => {
   jest.clearAllMocks();
 });
 
+function spyBridge(group: string, endPoint: string): jest.SpyInstance {
+  // @ts-ignore
+  return jest.spyOn(window[Bridges.EXPOSE_KEY][group], endPoint);
+}
+
 describe("browser-side inside electron", () => {
   // @ts-ignore
   window[Bridges.EXPOSE_KEY] = {
@@ -16,6 +21,7 @@ describe("browser-side inside electron", () => {
       doAction: jest.fn().mockName("example:doAction"),
       getConfig: jest.fn().mockName("example:getConfig"),
       calculate: jest.fn().mockName("example:calculate"),
+      getDate: jest.fn(() => Promise.resolve(new Date())).mockName("example:getDate"),
       onDate: jest.fn().mockName("example:onDate"),
       onClick: jest.fn().mockName("example:onClick"),
       watchMetrics: jest.fn().mockName("example:watchMetrics"),
@@ -148,5 +154,18 @@ describe("browser-side inside electron", () => {
       expect(data.percentCpuUsage).toBe(0.42);
       obs.complete();
     });
+  });
+
+  test("should on observable get first value from invoke", async () => {
+    const getSpy = spyBridge("example", "getDate");
+    const onSpy = spyBridge("example", "onDate");
+
+    expect(getSpy).not.toHaveBeenCalled();
+    expect(onSpy).not.toHaveBeenCalled();
+    new ExampleProxy();
+    setTimeout(() => {
+      expect(getSpy).toHaveBeenCalled();
+      expect(onSpy).toHaveBeenCalled();
+    }, 200);
   });
 });

@@ -74,7 +74,7 @@ export abstract class Bridges {
    * @param options the returned observable parameters
    * @return an observable bound to the passed `ON` endpoint
    */
-  public static of<Output extends CovalentData, Init extends Bridge.Invoke<CovalentData, Output>>(
+  public static of<Output extends CovalentData, Init extends Bridge.Invoke<any, Output>>(
     on: Bridge.On<Output>,
     options?: BridgeOfOptions<Output, Init>,
   ): BridgeOf<Bridge.On<Output>> {
