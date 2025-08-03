@@ -15,6 +15,7 @@ export interface ExampleBridge {
   getDate: Bridge.Invoke<void, Date>;
   onDate: Bridge.On<Date>;
   onClick: Bridge.On<ClickEvent>;
+  getMetrics: Bridge.Invoke<void, { percentCpuUsage: number }>,
   watchMetrics: Bridge.Callback<{ period: number }, { percentCpuUsage: number }>;
 }
 
@@ -28,7 +29,7 @@ export class LogProxy {
 
 @Proxy<ExampleProxy, ExampleBridge>({
   group: "example",
-  mirror: ["doAction", "calculate", "getDate"],
+  mirror: ["doAction", "calculate", "getDate", "getMetrics"],
   map: (bridge) => ({
     getConfiguration: Bridges.cache(bridge.getConfig),
     date$: Bridges.of(bridge.onDate, { init: bridge.getDate }),
@@ -43,6 +44,7 @@ export class ExampleProxy {
   public readonly getDate: ExampleBridge["getDate"] = Bridges.Default.Invoke(new Date());
   public readonly date$: BridgeOf<ExampleBridge["onDate"]> = interval(250).pipe(map(() => new Date()));
   public readonly click$: BridgeOf<ExampleBridge["onClick"]> = EMPTY;
+  public readonly getMetrics: ExampleBridge["getMetrics"] = Bridges.Default.Invoke({ percentCpuUsage: NaN });
   public readonly watch: BridgeOpen<ExampleBridge["watchMetrics"]> = Bridges.Default.Callback({ percentCpuUsage: NaN });
 
   public resetConfig(): void {

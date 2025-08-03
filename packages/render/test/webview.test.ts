@@ -24,6 +24,7 @@ describe("browser-side inside electron", () => {
       getDate: jest.fn(() => Promise.resolve(new Date())).mockName("example:getDate"),
       onDate: jest.fn().mockName("example:onDate"),
       onClick: jest.fn().mockName("example:onClick"),
+      getMetrics: jest.fn(() => Promise.resolve(0.14)).mockName("example:getMetrics"),
       watchMetrics: jest.fn().mockName("example:watchMetrics"),
       "watchMetrics:__close": jest.fn().mockName("example:watchMetrics:close"),
     },
@@ -159,5 +160,22 @@ describe("browser-side inside electron", () => {
       expect(getSpy).toHaveBeenCalled();
       expect(onSpy).toHaveBeenCalled();
     }, 200);
+  });
+
+  test("should callback get first value from invoke", async () => {
+    const watchMethod = Bridges.open<ExampleBridge, { period: number }, { percentCpuUsage: number }>(
+      Bridges.bind<ExampleBridge>("example"),
+      "watchMetrics",
+    );
+
+    const metricsSpy = spyBridge("example", "getMetrics");
+
+    expect(metricsSpy).not.toHaveBeenCalled();
+    const obs = await watchMethod.open({ period: 200 }, { init: Bridges.bind<ExampleBridge>("example")["getMetrics"] });
+    obs.subscribe(data => {
+      expect(metricsSpy).toHaveBeenCalled();
+      expect(data.percentCpuUsage).toBe(0.14);
+      obs.complete();
+    });
   });
 });

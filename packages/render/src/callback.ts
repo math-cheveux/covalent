@@ -31,7 +31,7 @@ export interface CallbackManager<Input extends CovalentData, Output extends Cova
    * @param options the callback options
    * @return the callback observable
    */
-  open<Init extends Bridge.Invoke<CovalentData, Output>>(
+  open<Init extends Bridge.Invoke<any, Output>>(
     input?: Input,
     options?: CallbackOptions<Output, Init>,
   ): Promise<CallbackObservable<Output>>;
