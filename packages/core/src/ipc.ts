@@ -160,7 +160,7 @@ export class Controllers {
     const promises: Promise<void>[] = [];
     for (const provider of providers) {
       promises.push(
-        Promise.resolve(this.getSync(provider.provide).covalentInit?.()).then(() => {
+        Promise.resolve(this.getSync(provider.provide).onCovalentInit?.()).then(() => {
           const subject = this._controllersInit.get(provider.provide.name)!;
           subject.next(true);
         }),
