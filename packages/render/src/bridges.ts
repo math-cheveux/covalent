@@ -7,13 +7,14 @@ import { KeysOfType } from "./keys-of-type";
 /**
  * Utility type to easily identify a proxy's observable linked to its bridge.
  */
-export type BridgeOf<On> =
-  On extends Bridge.On<infer Output> ? Observable<Output> : never;
+export type BridgeOf<On> = On extends Bridge.On<infer Output> ? Observable<Output> : never;
 
 export type BridgeOfOptions<Output extends CovalentData, Init extends Bridge.Invoke<CovalentData, Output>> = {
   defaultValue?: Output;
   init?: Init extends Bridge.Invoke<infer InitInput, Output>
-    ? (InitInput extends void ? Init : { invoke: Init; input: InitInput; })
+    ? InitInput extends void
+      ? Init
+      : { invoke: Init; input: InitInput }
     : never;
 };
 
@@ -21,7 +22,7 @@ export type BridgeOfOptions<Output extends CovalentData, Init extends Bridge.Inv
  * Utility class for manipulating bridge instances.
  */
 export abstract class Bridges {
-  public static readonly EXPOSE_KEY = 'covalent:bridge';
+  public static readonly EXPOSE_KEY = "covalent:bridge";
   private static readonly BRIDGE = window[Bridges.EXPOSE_KEY as keyof Window];
 
   /**
@@ -47,13 +48,13 @@ export abstract class Bridges {
         });
       });
     } else {
-      console.warn('BridgeFactory : Cannot get group bridge', group);
+      console.warn("BridgeFactory : Cannot get group bridge", group);
       obj = {};
       if (defaultApi) {
         Object.keys(defaultApi).forEach((key) => {
           Object.defineProperty(obj, key, {
             value: (...args: unknown[]) => {
-              console.warn('%s.%s : Not in electron app', group, key);
+              console.warn("%s.%s : Not in electron app", group, key);
               // @ts-expect-error key is indeed a key of defaultApi
               return defaultApi[key](...args);
             },
@@ -81,13 +82,11 @@ export abstract class Bridges {
 
     Promise.resolve(
       options?.init
-        ? (typeof options.init === 'object' ? options.init.invoke(options.init.input) : options.init())
+        ? (typeof options.init === "object" ? options.init.invoke(options.init.input) : options.init())
           .then((value) => subject.next(value))
         : null,
     ).finally(() => {
-      on((event: Bridge.Event<IpcRendererEvent, Output>) =>
-        subject.next(event.value),
-      );
+      on((event: Bridge.Event<IpcRendererEvent, Output>) => subject.next(event.value));
     });
 
     return subject.asObservable();
@@ -185,7 +184,9 @@ export abstract class Bridges {
    * Reset the stored-value of an overridden `INVOKE` function.
    * @param fn the overridden function to reset
    */
-  public static invalidateCache<Input extends CovalentData, Output extends CovalentData>(fn: Bridge.Invoke<Input, Output>) {
+  public static invalidateCache<Input extends CovalentData, Output extends CovalentData>(
+    fn: Bridge.Invoke<Input, Output>,
+  ) {
     this.CACHE_MAP.get(fn)?.clear();
   }
 
@@ -217,7 +218,7 @@ export abstract class Bridges {
     }
 
     private constructor() {}
-  }
+  };
 
   private constructor() {}
 }

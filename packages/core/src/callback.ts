@@ -14,11 +14,8 @@ export type CallbackPort<Input extends CovalentData, Output extends CovalentData
 export class CallbackManager<Input extends CovalentData, Output extends CovalentData> {
   private readonly ports: CallbackPort<Input, Output>[] = [];
 
-  constructor(
-    callbackKey: string,
-    private readonly handler: CallbackManagerHandler<Input, Output>,
-  ) {
-    Main.on<number>(callbackKey + ':__close', this.unwatch.bind(this));
+  constructor(callbackKey: string, private readonly handler: CallbackManagerHandler<Input, Output>) {
+    Main.on<number>(callbackKey + ":__close", this.unwatch.bind(this));
     Main.onMessagePort<Input, Output>(callbackKey, this.watch.bind(this));
   }
 
@@ -30,7 +27,7 @@ export class CallbackManager<Input extends CovalentData, Output extends Covalent
       subject.unsubscribe();
     });
     this.handler(subject, replyPort.input);
-  }
+  };
 
   public unwatch(portId: number): void {
     const index = this.ports.findIndex((port) => port.id === portId);

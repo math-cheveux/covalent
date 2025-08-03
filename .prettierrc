@@ -1,0 +1,10 @@
+{
+  "editorconfig": true,
+  "bracketSameLine": true,
+  "singleQuote": false,
+  "singleAttributePerLine": true,
+  "trailingComma": "all",
+  "arrowParens": "always",
+  "semi": true,
+  "parser": "typescript"
+}

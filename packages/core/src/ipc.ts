@@ -32,9 +32,9 @@ export type Provider = {
 export class Controllers {
   private static readonly _controllers = new Map<string, Object>();
   private static readonly _controllersInit = new Map<string, BehaviorSubject<boolean>>();
-  public static readonly BRIDGE_METADATA_PREFIX: string = 'covalent:bridge:';
-  public static readonly CALLBACK_MANAGERS_METADATA_KEY: string = 'covalent:callback_managers';
-  public static readonly EXPOSE_KEY = 'covalent:bridge';
+  public static readonly BRIDGE_METADATA_PREFIX: string = "covalent:bridge:";
+  public static readonly CALLBACK_MANAGERS_METADATA_KEY: string = "covalent:callback_managers";
+  public static readonly EXPOSE_KEY = "covalent:bridge";
 
   /**
    * Register the passed covalent controllers (to use in the electron process).
@@ -44,49 +44,39 @@ export class Controllers {
    */
   public static async register(...controllers: (Constructor | Provider)[]) {
     const providers = controllers.map((controller) =>
-      typeof controller === 'object'
-        ? controller
-        : { provide: controller, useClass: controller },
+      typeof controller === "object" ? controller : { provide: controller, useClass: controller },
     );
     const providerNames = providers.map((provider) => provider.provide.name);
     // Check self dependencies.
     for (const provider of providers) {
-      const depNames = this.getArgTypes(provider.useClass).map((arg) =>
-        typeof arg === 'function' ? arg.name : '?',
-      );
+      const depNames = this.getArgTypes(provider.useClass).map((arg) => (typeof arg === "function" ? arg.name : "?"));
       if (depNames.some((depName) => depName === provider.provide.name)) {
-        console.error(
-          `${provider.provide.name} has a direct dependency on itself.`,
-        );
-        throw new Error('Error while registering controllers.');
+        console.error(`${provider.provide.name} has a direct dependency on itself.`);
+        throw new Error("Error while registering controllers.");
       }
     }
     // Check unknown or missing dependencies.
     for (const provider of providers) {
-      const depNames = this.getArgTypes(provider.useClass).map((arg) =>
-        typeof arg === 'function' ? arg.name : '?',
-      );
-      const errors = depNames.filter(
-        (depName) => !providerNames.includes(depName),
-      );
+      const depNames = this.getArgTypes(provider.useClass).map((arg) => (typeof arg === "function" ? arg.name : "?"));
+      const errors = depNames.filter((depName) => !providerNames.includes(depName));
       if (errors.length > 0) {
         console.error(
-          `${provider.useClass.name} has dependencies to unknown/missing controllers: ${errors.join(', ')}.`,
+          `${provider.useClass.name} has dependencies to unknown/missing controllers: ${errors.join(", ")}.`,
         );
-        if (errors.some((error) => error === '?')) {
+        if (errors.some((error) => error === "?")) {
           console.error(
             `If the arguments are actually registered controllers, this issue could be caused by a cycle dependency between controllers inside a same project.`,
           );
         }
-        throw new Error('Error while registering controllers.');
+        throw new Error("Error while registering controllers.");
       }
     }
     // Check cycle dependencies.
     for (const provider of providers) {
       const check = this.gatherCycleDependency(providers, provider);
       if (check.length > 0) {
-        console.error(`Cycle dependency found: ${check.join(' -> ')}`);
-        throw new Error('Error while registering controllers.');
+        console.error(`Cycle dependency found: ${check.join(" -> ")}`);
+        throw new Error("Error while registering controllers.");
       }
     }
     // Order dependencies.
@@ -97,33 +87,22 @@ export class Controllers {
   }
 
   private static getArgTypes(fn: Function): unknown[] {
-    return Reflect.getMetadata('design:paramtypes', fn) ?? [];
+    return Reflect.getMetadata("design:paramtypes", fn) ?? [];
   }
 
   /**
    * @return the cycle dependency if found, starting and ending with the same element name, otherwise an empty array.
    */
-  private static gatherCycleDependency(
-    providers: Provider[],
-    provider: Provider,
-    route: string[] = [],
-  ): string[] {
+  private static gatherCycleDependency(providers: Provider[], provider: Provider, route: string[] = []): string[] {
     if (route.includes(provider.useClass.name)) {
-      return [
-        ...route.slice(route.findIndex((node) => node === provider.useClass.name)),
-        provider.useClass.name,
-      ];
+      return [...route.slice(route.findIndex((node) => node === provider.useClass.name)), provider.useClass.name];
     }
-    const depNames = this.getArgTypes(provider.useClass).map((arg) =>
-      typeof arg === 'function' ? arg.name : '?',
-    );
+    const depNames = this.getArgTypes(provider.useClass).map((arg) => (typeof arg === "function" ? arg.name : "?"));
     if (depNames.length === 0) {
       // If no dependency, no cycle.
       return [];
     }
-    const deps = depNames.map(
-      (depName) => providers.find((p) => p.provide.name === depName)!,
-    );
+    const deps = depNames.map((depName) => providers.find((p) => p.provide.name === depName)!);
     const newRoute = [...route, provider.useClass.name];
     for (const dep of deps) {
       const check = this.gatherCycleDependency(providers, dep, newRoute);
@@ -143,9 +122,7 @@ export class Controllers {
   private static forwardFirstDependency(providers: Provider[]): boolean {
     for (let i = 0; i < providers.length; i++) {
       const provider = providers[i];
-      const depNames = this.getArgTypes(provider.useClass).map((arg) =>
-        typeof arg === 'function' ? arg.name : '?',
-      );
+      const depNames = this.getArgTypes(provider.useClass).map((arg) => (typeof arg === "function" ? arg.name : "?"));
       if (depNames.length === 0) {
         continue;
       }
@@ -176,11 +153,12 @@ export class Controllers {
     // Init controllers when all controllers are defined for sure.
     const promises: Promise<void>[] = [];
     for (const provider of providers) {
-      promises.push(Promise.resolve(this.getSync(provider.provide).covalentInit?.())
-        .then(() => {
+      promises.push(
+        Promise.resolve(this.getSync(provider.provide).covalentInit?.()).then(() => {
           const subject = this._controllersInit.get(provider.provide.name)!;
           subject.next(true);
-        }));
+        }),
+      );
     }
     await Promise.all(promises);
   }
@@ -202,8 +180,9 @@ export class Controllers {
         reject(new Error(`Controller ${controller.name} is not registered.`));
         return;
       }
-      this._controllersInit.get(controller.name)!
-        .pipe(first(value => value))
+      this._controllersInit
+        .get(controller.name)!
+        .pipe(first((value) => value))
         .subscribe(() => resolve(this.getSync(controller)));
     });
   }
@@ -213,11 +192,18 @@ export class Controllers {
    */
   public static waitInit<T extends Object>(...controllers: Constructor<T>[]) {
     return Promise.all(
-      controllers.map(controller => new Promise<void>(resolve =>
-        this._controllersInit.get(controller.name)!
-          .pipe(first(value => value))
-          .subscribe(() => resolve())))
-    ).then(() => { /* Set return type to void, not void[]. */ });
+      controllers.map(
+        (controller) =>
+          new Promise<void>((resolve) =>
+            this._controllersInit
+              .get(controller.name)!
+              .pipe(first((value) => value))
+              .subscribe(() => resolve()),
+          ),
+      ),
+    ).then(() => {
+      /* Set return type to void, not void[]. */
+    });
   }
 
   /**
@@ -228,9 +214,9 @@ export class Controllers {
     const bridge: { [name: string]: any } = {};
     const groupController: { [name: string]: string } = {};
     controllers.forEach((controller) => {
-      const construct = 'name' in controller ? controller : controller.useClass;
+      const construct = "name" in controller ? controller : controller.useClass;
       const bridgeKey = Reflect.getMetadataKeys(construct).find(
-        (key) => typeof key === 'string' && key.startsWith(this.BRIDGE_METADATA_PREFIX),
+        (key) => typeof key === "string" && key.startsWith(this.BRIDGE_METADATA_PREFIX),
       );
       if (!bridgeKey) {
         throw new Error(`${construct.name} is not a controller.`);
@@ -287,9 +273,7 @@ export class Renderer {
   }
 
   public static on<Output extends CovalentData>(channel: string): Bridge.On<Output> {
-    return (
-      on: (next: Bridge.Event<Electron.IpcRendererEvent, Output>) => void,
-    ) => {
+    return (on: (next: Bridge.Event<Electron.IpcRendererEvent, Output>) => void) => {
       ipcRenderer.on(channel, (event, value) => on({ event, value }));
     };
   }
@@ -297,10 +281,7 @@ export class Renderer {
   public static callback<Input extends CovalentData, Output extends CovalentData>(
     channel: string,
   ): Bridge.Callback<Input, Output> {
-    return (
-      callback: (next: Bridge.Event<MessageEvent, Output>) => void,
-      input?: Input,
-    ) => {
+    return (callback: (next: Bridge.Event<MessageEvent, Output>) => void, input?: Input) => {
       // MessageChannels are lightweight--it's cheap to create a new one for each
       // request.
       const { port1, port2 } = new MessageChannel();
@@ -315,8 +296,7 @@ export class Renderer {
 
       // ... and we hang on to the other end. The main process will send messages
       // to its end of the port, and close it when it's finished.
-      port1.onmessage = (event: MessageEvent<Output>) =>
-        callback({ event: event, value: event.data });
+      port1.onmessage = (event: MessageEvent<Output>) => callback({ event: event, value: event.data });
       return portId;
     };
   }
@@ -334,27 +314,22 @@ export class Main {
     channel: string,
     handler: Handler.Invoke<Input, Output>,
   ) {
-    ipcMain.handle(channel, (_event: IpcMainInvokeEvent, data: Input) =>
-      handler(data),
-    );
+    ipcMain.handle(channel, (_event: IpcMainInvokeEvent, data: Input) => handler(data));
   }
 
   public static onMessagePort<Input extends CovalentData, Output extends CovalentData>(
     channel: string,
     handler: Handler.Callback<Input, Output>,
   ) {
-    ipcMain.on(
-      channel,
-      (event: IpcMainEvent, data: { portId: number; input: Input }) => {
-        const [replyPort] = event.ports;
-        handler({
-          id: data.portId,
-          input: data.input,
-          postMessage: (message) => replyPort.postMessage(message),
-          close: () => replyPort.close(),
-          onClose: (listener: () => void) => replyPort.once('close', listener),
-        });
-      },
-    );
+    ipcMain.on(channel, (event: IpcMainEvent, data: { portId: number; input: Input }) => {
+      const [replyPort] = event.ports;
+      handler({
+        id: data.portId,
+        input: data.input,
+        postMessage: (message) => replyPort.postMessage(message),
+        close: () => replyPort.close(),
+        onClose: (listener: () => void) => replyPort.once("close", listener),
+      });
+    });
   }
 }

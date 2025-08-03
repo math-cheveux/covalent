@@ -23,31 +23,31 @@ Here are the corresponding sequence diagrams:
 
 ```mermaid
 sequenceDiagram
-    note right of Render: SEND
-    Render -) Electron: sending
-    activate Electron
-    deactivate Electron
-    note right of Render: INVOKE
-    Render -) Electron: sending
-    activate Electron
-    Electron --) Render: answering
-    deactivate Electron
-    note right of Render: ON
-    loop
-        Electron -) Render: broadcast
-        activate Render
-        deactivate Render
-    end
-    note right of Render: CALLBACK
-    Render -) Electron: opening
-    activate Electron
-    loop
-        Electron --) Render: stream
-        activate Render
-        deactivate Render
-    end
-    Render -x Electron: closing
-    deactivate Electron
+  note right of Render: SEND
+  Render -) Electron: sending
+  activate Electron
+  deactivate Electron
+  note right of Render: INVOKE
+  Render -) Electron: sending
+  activate Electron
+  Electron --) Render: answering
+  deactivate Electron
+  note right of Render: ON
+  loop
+    Electron -) Render: broadcast
+    activate Render
+    deactivate Render
+  end
+  note right of Render: CALLBACK
+  Render -) Electron: opening
+  activate Electron
+  loop
+    Electron --) Render: stream
+    activate Render
+    deactivate Render
+  end
+  Render -x Electron: closing
+  deactivate Electron
 ```
 
 Since it is inter-process communication, all calls are asynchronous.
@@ -64,12 +64,12 @@ export type ClickEvent = { buttons: number; x: number; y: number; ctrl: boolean 
 // descriptions from the render process point of view
 
 export interface ExampleBridge {
-    doAction: Bridge.Send<string>; // sending a string
-    getConfig: Bridge.Invoke<void, { url: string }>; // asking an object
-    calculate: Bridge.Invoke<{ x: number }, number>; // sending an object and waiting for a number
-    onDate: Bridge.On<Date>; // watching dates
-    onClick: Bridge.On<ClickEvent>; // watching click events
-    watchMetrics: Bridge.Callback<{ period: number }, { percentCpuUsage: number }>; // sending a period and watching stats
+  doAction: Bridge.Send<string>; // sending a string
+  getConfig: Bridge.Invoke<void, { url: string }>; // asking an object
+  calculate: Bridge.Invoke<{ x: number }, number>; // sending an object and waiting for a number
+  onDate: Bridge.On<Date>; // watching dates
+  onClick: Bridge.On<ClickEvent>; // watching click events
+  watchMetrics: Bridge.Callback<{ period: number }, { percentCpuUsage: number }>; // sending a period and watching stats
 }
 ```
 
@@ -88,47 +88,47 @@ npm i @covalent/core
 To define a controller, just add the `Controller` decorator on a class.
 
 ```typescript
-import { interval, map, Subject } from 'rxjs';
+import { interval, map, Subject } from "rxjs";
 import { BridgeType, CallbackSubject, Controller } from "@covalent/core";
 
 @Controller<ExampleController, ExampleBridge>({
-    group: "example",
-    bridge: {
-        doAction: BridgeType.SEND,
-        getConfig: BridgeType.INVOKE,
-        calculate: BridgeType.INVOKE,
-        onDate: BridgeType.ON,
-        onClick: BridgeType.ON,
-        watchMetrics: BridgeType.CALLBACK,
-    },
-    handlers: (self) => ({
-        doAction: self.doAction,
-        getConfig: () => self.config,
-        calculate: self.calculate,
-        watchMetrics: self.startWatchingMetrics,
-    }),
-    triggers: (self) => ({
-        onDate: interval(200).pipe(map(() => new Date())),
-        onClick: self.clickSubject.asObservable(),
-    })
+  group: "example",
+  bridge: {
+    doAction: BridgeType.SEND,
+    getConfig: BridgeType.INVOKE,
+    calculate: BridgeType.INVOKE,
+    onDate: BridgeType.ON,
+    onClick: BridgeType.ON,
+    watchMetrics: BridgeType.CALLBACK,
+  },
+  handlers: (self) => ({
+    doAction: self.doAction,
+    getConfig: () => self.config,
+    calculate: self.calculate,
+    watchMetrics: self.startWatchingMetrics,
+  }),
+  triggers: (self) => ({
+    onDate: interval(200).pipe(map(() => new Date())),
+    onClick: self.clickSubject.asObservable(),
+  })
 })
 export class ExampleController {
-    constructor(private readonly anotherController: AnotherController, ...) {
-    }
+  constructor(private readonly anotherController: AnotherController, ...) {
+  }
 
-    private clickSubject = new Subject<ClickEvent>();
+  private clickSubject = new Subject<ClickEvent>();
 
-    private doAction(action: string) { ...
-    }
+  private doAction(action: string) { ...
+  }
 
-    public get config(): { url: string } { ...
-    }
+  public get config(): { url: string } { ...
+  }
 
-    private calculate(params: { x: number }): number { ...
-    }
+  private calculate(params: { x: number }): number { ...
+  }
 
-    public startWatchingMetrics(subject: CallbackSubject<{ percentCpuUsage: number }>, input: { period: number }) { ...
-    }
+  public startWatchingMetrics(subject: CallbackSubject<{ percentCpuUsage: number }>, input: { period: number }) { ...
+  }
 }
 ```
 
@@ -161,10 +161,10 @@ method.
 
 ```mermaid
 classDiagram
-    class OnInit {
-        <<interface>>
-        + onCovalentInit() void | PromiseLike~void~
-    }
+  class OnInit {
+    <<interface>>
+    + onCovalentInit() void | PromiseLike~void~
+  }
 ```
 
 The `OnInit` interface allows controllers to have an asynchronous initialization part (since constructors are always
@@ -198,38 +198,38 @@ To define a proxy, just add the `Proxy` decorator on an Angular service (or a si
 project).
 
 ```typescript
-import { EMPTY, interval, map } from 'rxjs';
+import { EMPTY, interval, map } from "rxjs";
 import { BridgeOf, BridgeOpen, Bridges, Proxy } from "@covalent/render";
 
 @Injectable() // Angular services decorator.
 @Proxy<ExampleProxy, ExampleBridge>({
-    group: 'example',
-    mirror: ['doAction', 'calculate'],
-    map: (bridge) => ({
-        getConfiguration: bridge.getConfig, // or Bridges.cache(bridge.getConfig) for optimization
-        date$: Bridges.of(bridge.onDate),
-        click$: Bridges.of(bridge.onClick),
-        watch: Bridges.open(bridge, 'watchMetrics'),
-    }),
+  group: "example",
+  mirror: ["doAction", "calculate"],
+  map: (bridge) => ({
+    getConfiguration: bridge.getConfig, // or Bridges.cache(bridge.getConfig) for optimization
+    date$: Bridges.of(bridge.onDate),
+    click$: Bridges.of(bridge.onClick),
+    watch: Bridges.open(bridge, "watchMetrics"),
+  }),
 })
 export class ExampleProxy {
-    public readonly doAction: ExampleBridge['doAction']
-        = Bridges.Default.Send();
-    public readonly getConfiguration: ExampleBridge['getConfig']
-        = Bridges.Default.Invoke({ url: "/" });
-    public readonly calculate: ExampleBridge['calculate']
-        = Bridges.Default.Invoke(NaN);
-    public readonly date$: BridgeOf<ExampleBridge['onDate']>
-        = interval(250).pipe(map(() => new Date()));
-    public readonly click$: BridgeOf<ExampleBridge['onClick']>
-        = EMPTY;
-    public readonly watch: BridgeOpen<ExampleBridge['watchMetrics']>
-        = Bridges.Default.Callback({ percentCpuUsage: NaN });
+  public readonly doAction: ExampleBridge["doAction"]
+    = Bridges.Default.Send();
+  public readonly getConfiguration: ExampleBridge["getConfig"]
+    = Bridges.Default.Invoke({ url: "/" });
+  public readonly calculate: ExampleBridge["calculate"]
+    = Bridges.Default.Invoke(NaN);
+  public readonly date$: BridgeOf<ExampleBridge["onDate"]>
+    = interval(250).pipe(map(() => new Date()));
+  public readonly click$: BridgeOf<ExampleBridge["onClick"]>
+    = EMPTY;
+  public readonly watch: BridgeOpen<ExampleBridge["watchMetrics"]>
+    = Bridges.Default.Callback({ percentCpuUsage: NaN });
 
-    // If Bridges.cache is used for getConfiguration.
-    public resetConfig(): void {
-        Bridges.invalidateCache(this.getConfiguration);
-    }
+  // If Bridges.cache is used for getConfiguration.
+  public resetConfig(): void {
+    Bridges.invalidateCache(this.getConfiguration);
+  }
 }
 ```
 
@@ -239,14 +239,14 @@ export class ExampleProxy {
 - `map` defines the mapping of the bridge instance on the proxy instance. Keys are the proxy members name, values are
   the bridge mapping.
   The utility class `Bridges` must be used:
-    - `cache` can be used on `INVOKE` endpoints to optimize calls that will return the same value everytime for a given
-      parameter.
-      `cache` accepts a second argument to define a reset behavior, otherwise, use `Bridges.invalidateCache` (cf.
-      `resetConfig` in the example) or `Bridges.invalidateCaches` to reset the cache manually.
-      _Note_: cached values are not shared between application instances, and they are deleted at the end of the
-      application.
-    - `of` must be used to manage `ON` endpoints.
-    - `open` must be used to manage `CALLBACK` endpoints.
+  - `cache` can be used on `INVOKE` endpoints to optimize calls that will return the same value everytime for a given
+    parameter.
+    `cache` accepts a second argument to define a reset behavior, otherwise, use `Bridges.invalidateCache` (cf.
+    `resetConfig` in the example) or `Bridges.invalidateCaches` to reset the cache manually.
+    _Note_: cached values are not shared between application instances, and they are deleted at the end of the
+    application.
+  - `of` must be used to manage `ON` endpoints.
+  - `open` must be used to manage `CALLBACK` endpoints.
 
 `mirror` and `map` are optional parameters, since it is not required that one proxy exposes all its controller
 endpoints.

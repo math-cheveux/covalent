@@ -7,7 +7,6 @@ import { CallbackManager, CallbackManagerHandler } from "./callback";
 import { ReflectUtils } from "./reflect-utils";
 import "reflect-metadata";
 
-
 /**
  * Interface to use on a covalent controller when it needs an asynchronous initialization step.
  */
@@ -57,61 +56,51 @@ export interface ControllerSettings<C, B> {
  */
 export function Controller<C, B>(settings: ControllerSettings<C, B>) {
   function getChannel(group: string, key: string) {
-    return group + ':' + key;
+    return group + ":" + key;
   }
 
   return function <T extends Constructor>(target: T) {
     const { group, bridge, handlers, triggers } = settings;
     const metadataBridge = Object.keys(bridge).reduce((finalBridge, key) => {
-      finalBridge[key] = (bridge[key as keyof B] as BridgeType).bridge(
-        getChannel(group, key),
-      );
+      finalBridge[key] = (bridge[key as keyof B] as BridgeType).bridge(getChannel(group, key));
       if (bridge[key as keyof B] === BridgeType.CALLBACK) {
-        finalBridge[key + ':__close'] = BridgeType.SEND.bridge(getChannel(group, key + ':__close'));
+        finalBridge[key + ":__close"] = BridgeType.SEND.bridge(getChannel(group, key + ":__close"));
       }
       return finalBridge;
     }, {} as any);
-    Reflect.defineMetadata(
-      Controllers.BRIDGE_METADATA_PREFIX + group,
-      metadataBridge,
-      target,
-    );
+    Reflect.defineMetadata(Controllers.BRIDGE_METADATA_PREFIX + group, metadataBridge, target);
     return class extends target {
       // @ts-ignore
       static readonly name = target.name;
 
       constructor(...args: any[]) {
         super(
-          ...(Reflect.getMetadata('design:paramtypes', target) || []).map(
+          ...(Reflect.getMetadata("design:paramtypes", target) || []).map(
             (data: any, i: number) => Controllers.getSync(data) ?? args?.[i],
           ),
         );
-        const selfHandlers: ReturnType<ControllerSettings<C, B>['handlers']>
-           = handlers(this as unknown as C);
+        const selfHandlers: ReturnType<ControllerSettings<C, B>["handlers"]> = handlers(this as unknown as C);
         for (const handlerKey in selfHandlers) {
           const handler = selfHandlers[handlerKey];
           if (bridge[handlerKey] !== BridgeType.CALLBACK) {
-            bridge[handlerKey].handler!(
-              getChannel(group, handlerKey),
-              handler.bind(this) as any,
-            );
+            bridge[handlerKey].handler!(getChannel(group, handlerKey), handler.bind(this) as any);
           } else {
             ReflectUtils.computeMetadataIfAbsent(
               Controllers.CALLBACK_MANAGERS_METADATA_KEY,
               target,
               () => new Map<string, CallbackManager<CovalentData, CovalentData>>(),
-            ).set(handlerKey, new CallbackManager(
-              getChannel(group, handlerKey),
-              handler.bind(this) as CallbackManagerHandler<CovalentData, CovalentData>,
-            ));
+            ).set(
+              handlerKey,
+              new CallbackManager(
+                getChannel(group, handlerKey),
+                handler.bind(this) as CallbackManagerHandler<CovalentData, CovalentData>,
+              ),
+            );
           }
         }
-        const selfTriggers: ReturnType<ControllerSettings<C, B>['triggers']>
-          = triggers(this as unknown as C);
+        const selfTriggers: ReturnType<ControllerSettings<C, B>["triggers"]> = triggers(this as unknown as C);
         for (const triggerKey in selfTriggers) {
-          selfTriggers[triggerKey].subscribe((next: any) =>
-            WebContents.send(getChannel(group, triggerKey), next),
-          );
+          selfTriggers[triggerKey].subscribe((next: any) => WebContents.send(getChannel(group, triggerKey), next));
         }
       }
     };

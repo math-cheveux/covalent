@@ -2,7 +2,7 @@ import { Controllers } from "../src";
 import { ExampleController, LogController } from "./test-interfaces";
 import * as electron from "electron";
 
-jest.mock('electron', () => ({
+jest.mock("electron", () => ({
   ipcRenderer: {
     on: jest.fn(),
     send: jest.fn(),
@@ -13,7 +13,7 @@ jest.mock('electron', () => ({
 }));
 
 describe("preload script", () => {
-  test('should expose controllers', () => {
+  test("should expose controllers", () => {
     const exposeSpy = jest.spyOn(electron.contextBridge, "exposeInMainWorld");
 
     expect(exposeSpy).not.toHaveBeenCalled();
@@ -35,4 +35,4 @@ describe("preload script", () => {
       },
     });
   });
-})
+});

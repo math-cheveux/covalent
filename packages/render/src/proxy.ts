@@ -13,9 +13,9 @@ export interface ProxySettings<P, B> {
   group: string;
   mirror?: {
     [K in keyof Partial<P>]-?: K extends keyof B
-      ? (B[K] extends Bridge.Send<CovalentData> | Bridge.Invoke<CovalentData, CovalentData>
+      ? B[K] extends Bridge.Send<CovalentData> | Bridge.Invoke<CovalentData, CovalentData>
         ? K
-        : never)
+        : never
       : never;
   }[keyof P][];
   map?: (bridge: B) => {

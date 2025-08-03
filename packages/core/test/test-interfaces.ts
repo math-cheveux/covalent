@@ -4,7 +4,6 @@ import { BridgeType, CallbackSubject, Controller, OnInit } from "../src";
 
 type ClickEvent = { buttons: number; x: number; y: number; ctrl: boolean };
 
-
 interface LogBridge {
   info: Bridge.Send<string>;
 }
@@ -18,16 +17,15 @@ interface ExampleBridge {
   watchMetrics: Bridge.Callback<{ period: number }, { percentCpuUsage: number }>;
 }
 
-
 @Controller<LogController, LogBridge>({
   group: "log",
   bridge: {
     info: BridgeType.SEND,
   },
-  handlers: self => ({
-    info: self.info
+  handlers: (self) => ({
+    info: self.info,
   }),
-  triggers: _ => ({}),
+  triggers: (_) => ({}),
 })
 export class LogController implements OnInit {
   onCovalentInit(): void | PromiseLike<void> {}
@@ -56,11 +54,10 @@ export class LogController implements OnInit {
   triggers: (self) => ({
     onDate: interval(200).pipe(map(() => new Date())),
     onClick: self.clickSubject.asObservable(),
-  })
+  }),
 })
 export class ExampleController {
-  constructor(private readonly logController: LogController) {
-  }
+  constructor(private readonly logController: LogController) {}
 
   private clickSubject = new Subject<ClickEvent>();
 

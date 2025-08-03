@@ -4,9 +4,7 @@ describe("browser-side without electron", () => {
   const logProxy = new LogProxy();
   const exampleProxy = new ExampleProxy();
 
-  test("should have default behavior", () => {
-
-  });
+  test("should have default behavior", () => {});
 });
 
 describe("browser-side", () => {

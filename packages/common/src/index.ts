@@ -1,4 +1,4 @@
-import { IpcRendererEvent } from 'electron';
+import { IpcRendererEvent } from "electron";
 
 export type CovalentData =
   | null

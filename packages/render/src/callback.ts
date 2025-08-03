@@ -9,7 +9,9 @@ export interface CallbackObservable<T> extends Observable<T> {
 export type CallbackOptions<Output extends CovalentData, Init extends Bridge.Invoke<any, Output>> = {
   defaultValue?: Output;
   init?: Init extends Bridge.Invoke<infer InitInput, Output>
-    ? (InitInput extends void ? Init : { invoke: Init; input: InitInput; })
+    ? InitInput extends void
+      ? Init
+      : { invoke: Init; input: InitInput }
     : never;
 };
 
@@ -35,7 +37,8 @@ export interface CallbackManager<Input extends CovalentData, Output extends Cova
   ): Promise<CallbackObservable<Output>>;
 }
 
-export class CallbackManagerImpl<B, Input extends CovalentData, Output extends CovalentData> implements CallbackManager<Input, Output> {
+export class CallbackManagerImpl<B, Input extends CovalentData, Output extends CovalentData>
+  implements CallbackManager<Input, Output> {
   public constructor(
     private readonly bridge: B,
     private readonly callbackKey: Extract<KeysOfType<B, Bridge.Callback<Input, Output>>, string>,
@@ -47,7 +50,7 @@ export class CallbackManagerImpl<B, Input extends CovalentData, Output extends C
   }
 
   private get close(): Bridge.Send<number> {
-    return this.bridge[(this.callbackKey + ':__close') as keyof B] as Bridge.Send<number>;
+    return this.bridge[(this.callbackKey + ":__close") as keyof B] as Bridge.Send<number>;
   }
 
   public async open<Init extends Bridge.Invoke<CovalentData, Output>>(
@@ -56,18 +59,13 @@ export class CallbackManagerImpl<B, Input extends CovalentData, Output extends C
   ): Promise<CallbackObservable<Output>> {
     const subject =
       options?.defaultValue != undefined || this.defaultValue != undefined
-        ? new BehaviorSubject<Output>(
-          options?.defaultValue ?? this.defaultValue!,
-        )
+        ? new BehaviorSubject<Output>(options?.defaultValue ?? this.defaultValue!)
         : new Subject<Output>();
     if (options?.init) {
-      await (typeof options.init === 'object' ? options.init.invoke(options.init.input) : options.init())
+      await (typeof options.init === "object" ? options.init.invoke(options.init.input) : options.init())
         .then((value) => subject.next(value));
     }
-    const closingPort = this.callback(
-      (event) => subject.next(event.value),
-      input,
-    );
+    const closingPort = this.callback((event) => subject.next(event.value), input);
 
     subject.subscribe({ complete: () => this.close(closingPort) });
     return subject;
