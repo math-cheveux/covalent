@@ -35,6 +35,12 @@ export class CallbackManager<Input extends CovalentData, Output extends Covalent
       this.ports.splice(index, 1)[0].close();
     }
   }
+
+  public unwatchAll(): void {
+    for (const port of this.ports.splice(0)) {
+      port.close();
+    }
+  }
 }
 
 export type CallbackSubject<Output extends CovalentData> = {

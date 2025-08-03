@@ -100,7 +100,9 @@ export function Controller<C, B>(settings: ControllerSettings<C, B>) {
         }
         const selfTriggers: ReturnType<ControllerSettings<C, B>["triggers"]> = triggers(this as unknown as C);
         for (const triggerKey in selfTriggers) {
-          selfTriggers[triggerKey].subscribe((next: any) => WebContents.send(getChannel(group, triggerKey), next));
+          Controllers.storeSubscriptionForDisposal(
+            selfTriggers[triggerKey].subscribe((next: any) => WebContents.send(getChannel(group, triggerKey), next))
+          );
         }
       }
     };

@@ -1,7 +1,9 @@
+import { BehaviorSubject, first, Subscription } from "rxjs";
 import { contextBridge, ipcMain, IpcMainEvent, IpcMainInvokeEvent, ipcRenderer, webContents } from "electron";
 import { Bridge, CovalentData } from "@covalent/common";
 import { Handler } from "./handler";
-import { BehaviorSubject, first } from "rxjs";
+import { CallbackManager } from "./callback";
+import { ReflectUtils } from "./reflect-utils";
 
 /**
  * Generic type representing any constructor.
@@ -32,6 +34,7 @@ export type Provider = {
 export class Controllers {
   private static readonly _controllers = new Map<string, Object>();
   private static readonly _controllersInit = new Map<string, BehaviorSubject<boolean>>();
+  private static readonly _controllersSubscriptions: Subscription[] = [];
   public static readonly BRIDGE_METADATA_PREFIX: string = "covalent:bridge:";
   public static readonly CALLBACK_MANAGERS_METADATA_KEY: string = "covalent:callback_managers";
   public static readonly EXPOSE_KEY = "covalent:bridge";
@@ -187,6 +190,10 @@ export class Controllers {
     });
   }
 
+  public static storeSubscriptionForDisposal(sub: Subscription) {
+    this._controllersSubscriptions.push(sub);
+  }
+
   /**
    * Return a promise that will resolve when all the passed controllers are initialized.
    */
@@ -232,6 +239,18 @@ export class Controllers {
   }
 
   public static dispose() {
+    for (const sub of this._controllersSubscriptions.splice(0)) {
+      sub.unsubscribe();
+    }
+    for (const controller of this._controllers.values()) {
+      for (const manager of ReflectUtils.computeMetadataIfAbsent(
+        Controllers.CALLBACK_MANAGERS_METADATA_KEY,
+        controller.constructor,
+        () => new Map<string, CallbackManager<CovalentData, CovalentData>>(),
+      ).values()) {
+        manager.unwatchAll();
+      }
+    }
     this._controllers.clear();
     for (const subject of this._controllersInit.values()) {
       subject.complete();
