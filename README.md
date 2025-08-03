@@ -1,3 +1,5 @@
+[![Coverage](https://github.com/math-cheveux/covalent/actions/workflows/coverage.yml/badge.svg)](https://github.com/math-cheveux/covalent/actions/workflows/coverage.yml)
+
 # Introduction
 
 Covalent is a TypeScript library which encapsulates and facilitates inter-process communications between an Electron
