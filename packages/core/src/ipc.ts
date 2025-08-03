@@ -200,8 +200,8 @@ export class Controllers {
   /**
    * Return a promise that will resolve when all the passed controllers are initialized.
    */
-  public static waitInit<T extends Object>(...controllers: Constructor<T>[]) {
-    return Promise.all(
+  public static async waitInit<T extends Object>(...controllers: Constructor<T>[]) {
+    await Promise.all(
       controllers.map(
         (controller) =>
           new Promise<void>((resolve) =>
@@ -211,9 +211,7 @@ export class Controllers {
               .subscribe(() => resolve()),
           ),
       ),
-    ).then(() => {
-      /* Set return type to void, not void[]. */
-    });
+    );
   }
 
   /**
