@@ -24,13 +24,17 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      # 4. Lance les tests avec coverage et merge
+      # 4. Construis les sous-packages
+      - name: Build packages
+        run: npm run build
+
+      # 5. Lance les tests avec coverage et merge
       - name: Run coverage for server
         run: npm run test:core && npm run test:render
 
-      # 5. Upload à Codecov (si tu veux)
+      # 6. Upload à Codecov
       - name: Upload to Codecov
         uses: codecov/codecov-action@v5
         with:
           files: coverage/lcov.info
-          token: ${{ secrets.CODECOV_TOKEN }} # Pas besoin pour repo public
+          token: ${{ secrets.CODECOV_TOKEN }}
