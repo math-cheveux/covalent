@@ -23,7 +23,7 @@ export class CallbackManager<Input extends CovalentData, Output extends Covalent
     this.ports.push(replyPort);
     const subject = new Subject<Output>();
     subject.subscribe((next) => replyPort.postMessage(next));
-    replyPort.onClose(() => {
+    replyPort.onClose(/* istanbul ignore next */ () => {
       subject.unsubscribe();
     });
     this.handler(subject, replyPort.input);
