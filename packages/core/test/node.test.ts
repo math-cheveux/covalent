@@ -1,4 +1,4 @@
-import { CallbackManager, CallbackPort, Controller, Controllers, OnInit, WebContents } from "../src";
+import { CallbackManager, CallbackPort, CallbackSubject, Controller, Controllers, OnInit, WebContents } from "../src";
 import { ExampleController, LogController } from "./test-interfaces";
 
 const wc = {
@@ -21,7 +21,10 @@ jest.mock("electron", () => ({
   },
 }));
 
-afterEach(() => Controllers.dispose());
+afterEach(() => {
+  Controllers.dispose();
+  jest.clearAllMocks();
+});
 
 describe("electron-side", () => {
   test("should register controllers", async () => {
@@ -179,6 +182,44 @@ describe("electron-side", () => {
     expect(closeSpy).not.toHaveBeenCalled();
     manager.unwatchAll();
     expect(closeSpy).toHaveBeenCalled();
+  });
+
+  test("should detect callback closing from render", () => {
+    const closeListeners: (() => void)[] = [];
+    const port: CallbackPort<number, number> = {
+      id: 0,
+      input: 1,
+      postMessage: jest.fn().mockName("port:post"),
+      close: jest.fn(),
+      onClose: jest.fn((listener) => closeListeners.push(listener)),
+    };
+
+    let closed = false;
+    function watchLoop(subject: CallbackSubject<number>, input: number) {
+      if (subject.closed) {
+        closed = true;
+        return;
+      }
+      subject.next(input);
+      setTimeout(() => watchLoop(subject, 2*input), 100);
+    }
+
+
+    const postSpy = jest.spyOn(port, "postMessage");
+
+    const manager = new CallbackManager<number, number>("test", watchLoop);
+    manager.watch(port);
+
+    expect(postSpy).toHaveBeenCalledTimes(1);
+    setTimeout(() => {
+      expect(postSpy).toHaveBeenCalledTimes(2);
+      expect(closed).toBeFalsy();
+      closeListeners.forEach(listener => listener());
+      setTimeout(() => {
+        expect(postSpy).toHaveBeenCalledTimes(2);
+        expect(closed).toBeTruthy();
+      }, 100);
+    }, 150);
   });
 
   test("should accept multiple registration", async () => {
