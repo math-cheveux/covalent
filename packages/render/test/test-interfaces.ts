@@ -4,11 +4,11 @@ import { BridgeOf, BridgeOpen, Bridges, Proxy } from "../src";
 
 type ClickEvent = { buttons: number; x: number; y: number; ctrl: boolean };
 
-interface LogBridge {
+export interface LogBridge {
   info: Bridge.Send<string>;
 }
 
-interface ExampleBridge {
+export interface ExampleBridge {
   doAction: Bridge.Send<string>;
   getConfig: Bridge.Invoke<void, { url: string }>;
   calculate: Bridge.Invoke<{ x: number }, number>;
@@ -29,7 +29,7 @@ export class LogProxy {
   group: "example",
   mirror: ["doAction", "calculate"],
   map: (bridge) => ({
-    getConfiguration: bridge.getConfig, // ou Bridges.cache(bridge.getConfig) pour optimiser
+    getConfiguration: Bridges.cache(bridge.getConfig),
     date$: Bridges.of(bridge.onDate),
     click$: Bridges.of(bridge.onClick),
     watch: Bridges.open(bridge, "watchMetrics"),
@@ -43,7 +43,6 @@ export class ExampleProxy {
   public readonly click$: BridgeOf<ExampleBridge["onClick"]> = EMPTY;
   public readonly watch: BridgeOpen<ExampleBridge["watchMetrics"]> = Bridges.Default.Callback({ percentCpuUsage: NaN });
 
-  // Si Bridges.cache est utilisé pour getConfiguration.
   public resetConfig(): void {
     Bridges.invalidateCache(this.getConfiguration);
   }

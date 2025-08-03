@@ -1,38 +1,28 @@
+import { Bridges } from "../src";
 import { ExampleProxy, LogProxy } from "./test-interfaces";
 
 describe("browser-side without electron", () => {
-  const logProxy = new LogProxy();
-  const exampleProxy = new ExampleProxy();
-
-  test("should have default behavior", () => {});
-});
-
-describe("browser-side", () => {
   // @ts-ignore
-  window["covalent:bridge"] = {
-    log: {
-      info: jest.fn().mockName("log:info"),
-    },
-    example: {
-      doAction: jest.fn().mockName("example:doAction"),
-      getConfig: jest.fn().mockName("example:getConfig"),
-      calculate: jest.fn().mockName("example:calculate"),
-      onDate: jest.fn().mockName("example:onDate"),
-      onClick: jest.fn().mockName("example:onClick"),
-      watchMetrics: jest.fn().mockName("example:watchMetrics"),
-      "watchMetrics:__close": jest.fn().mockName("example:watchMetrics:close"),
-    },
-  };
+  window[Bridges.EXPOSE_KEY] = undefined;
 
   const logProxy = new LogProxy();
   const exampleProxy = new ExampleProxy();
 
-  test("should call bridge", () => {
-    // @ts-ignore
-    const infoSpy = jest.spyOn(window["covalent:bridge"]["log"], "info");
+  test("should not be bound", () => {
+    expect(Bridges.isBound("log")).toBeFalsy();
+    expect(Bridges.isBound("example")).toBeFalsy();
+  });
 
-    expect(infoSpy).not.toHaveBeenCalled();
-    logProxy.info("test");
-    expect(infoSpy).toHaveBeenCalledWith("test");
+  test("should not bind", () => {
+    expect(Bridges.bind("log")).toStrictEqual({});
+    expect(Bridges.bind("example")).toStrictEqual({});
+  });
+
+  test("should not throw errors", async () => {
+    expect(() => logProxy.info("test")).not.toThrow();
+    expect(() => exampleProxy.doAction("test")).not.toThrow();
+    await expect(exampleProxy.getConfiguration()).resolves.not.toThrow();
+    await expect(exampleProxy.calculate({ x: 0 })).resolves.not.toThrow();
+    await expect(exampleProxy.watch({ period: 100 })).resolves.not.toThrow();
   });
 });
