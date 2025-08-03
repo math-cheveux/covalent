@@ -1,5 +1,5 @@
 import { EMPTY, interval, map } from "rxjs";
-import { Bridge } from "@covalent/common";
+import { Bridge } from "@electron-covalent/common";
 import { BridgeOf, BridgeOpen, Bridges, Proxy } from "../src";
 
 type ClickEvent = { buttons: number; x: number; y: number; ctrl: boolean };

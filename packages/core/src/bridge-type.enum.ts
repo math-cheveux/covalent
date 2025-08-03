@@ -1,4 +1,4 @@
-import { Bridge, CovalentData } from "@covalent/common";
+import { Bridge, CovalentData } from "@electron-covalent/common";
 import { Handler } from "./handler";
 import { Main, Renderer } from "./ipc";
 

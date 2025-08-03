@@ -1,6 +1,6 @@
-[![npm version](https://img.shields.io/npm/v/@covalent/common)](https://www.npmjs.com/package/@covalent/common)
-[![npm version](https://img.shields.io/npm/v/@covalent/core)](https://www.npmjs.com/package/@covalent/core)
-[![npm version](https://img.shields.io/npm/v/@covalent/render)](https://www.npmjs.com/package/@covalent/render)
+[![npm version](https://img.shields.io/npm/v/@electron-covalent/common)](https://www.npmjs.com/package/@electron-covalent/common)
+[![npm version](https://img.shields.io/npm/v/@electron-covalent/core)](https://www.npmjs.com/package/@electron-covalent/core)
+[![npm version](https://img.shields.io/npm/v/@electron-covalent/render)](https://www.npmjs.com/package/@electron-covalent/render)
 [![Coverage](https://github.com/math-cheveux/covalent/actions/workflows/coverage.yml/badge.svg)](https://github.com/math-cheveux/covalent/actions/workflows/coverage.yml)
 
 # Introduction
@@ -62,7 +62,7 @@ Since it is inter-process communication, all calls are asynchronous.
 In the following sections, the following interfaces will be used in the example codes:
 
 ```typescript
-import { Bridge } from "@covalent/types";
+import { Bridge } from "@electron-covalent/types";
 
 export type ClickEvent = { buttons: number; x: number; y: number; ctrl: boolean };
 
@@ -85,7 +85,7 @@ export interface ExampleBridge {
 To install Covalent in your Electron project, run the following command:
 
 ```shell
-npm i @covalent/core
+npm i @electron-covalent/core
 ```
 
 ## Definition
@@ -94,7 +94,7 @@ To define a controller, just add the `Controller` decorator on a class.
 
 ```typescript
 import { interval, map, Subject } from "rxjs";
-import { BridgeType, CallbackSubject, Controller } from "@covalent/core";
+import { BridgeType, CallbackSubject, Controller } from "@electron-covalent/core";
 
 @Controller<ExampleController, ExampleBridge>({
   group: "example",
@@ -194,7 +194,7 @@ Controllers.exposeBridge(..., ExampleController, ...);
 To install Covalent in your frontend project, run the following command:
 
 ```shell
-npm i @covalent/render
+npm i @electron-covalent/render
 ```
 
 ## Definition
@@ -204,7 +204,7 @@ project).
 
 ```typescript
 import { EMPTY, interval, map } from "rxjs";
-import { BridgeOf, BridgeOpen, Bridges, Proxy } from "@covalent/render";
+import { BridgeOf, BridgeOpen, Bridges, Proxy } from "@electron-covalent/render";
 
 @Injectable() // Angular services decorator.
 @Proxy<ExampleProxy, ExampleBridge>({

@@ -1,5 +1,5 @@
 import { Observable } from "rxjs";
-import { Bridge, CovalentData } from "@covalent/common";
+import { Bridge, CovalentData } from "@electron-covalent/common";
 import { BridgeType } from "./bridge-type.enum";
 import { Handler } from "./handler";
 import { Constructor, Controllers, WebContents } from "./ipc";

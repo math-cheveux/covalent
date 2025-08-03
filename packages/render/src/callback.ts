@@ -1,5 +1,5 @@
 import { BehaviorSubject, Observable, Subject } from "rxjs";
-import { Bridge, CovalentData } from "@covalent/common";
+import { Bridge, CovalentData } from "@electron-covalent/common";
 import { KeysOfType } from "./keys-of-type";
 
 export interface CallbackObservable<T> extends Observable<T> {

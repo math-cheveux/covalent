@@ -1,4 +1,4 @@
-import { Bridge } from "@covalent/common";
+import { Bridge } from "@electron-covalent/common";
 import { Bridges } from "../src";
 import { ExampleProxy, LogProxy } from "./test-interfaces";
 

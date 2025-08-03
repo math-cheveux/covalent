@@ -1,5 +1,5 @@
 import { interval, map, Subject } from "rxjs";
-import { Bridge } from "@covalent/common";
+import { Bridge } from "@electron-covalent/common";
 import { BridgeType, CallbackSubject, Controller, OnInit } from "../src";
 
 export type ClickEvent = { buttons: number; x: number; y: number; ctrl: boolean };

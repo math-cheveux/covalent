@@ -1,5 +1,5 @@
 import { Subject } from "rxjs";
-import { CovalentData } from "@covalent/common";
+import { CovalentData } from "@electron-covalent/common";
 import { Main } from "./ipc";
 import { Handler } from "./handler";
 

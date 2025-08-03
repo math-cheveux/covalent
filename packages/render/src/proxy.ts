@@ -1,4 +1,4 @@
-import { Bridge } from "@covalent/common";
+import { Bridge } from "@electron-covalent/common";
 import { BridgeOpen, CallbackManager, CallbackManagerImpl } from "./callback";
 import { Bridges } from "./bridges";
 

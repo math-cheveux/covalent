@@ -1,5 +1,5 @@
 {
-  "name": "@covalent/render",
+  "name": "@electron-covalent/render",
   "version": "1.0.0",
   "description": "Covalent library for Angular render-side",
   "repository": "https://github.com/math-cheveux/electron-covalent",
@@ -24,7 +24,7 @@
     "test": "jest --detectOpenHandles --coverage"
   },
   "dependencies": {
-    "@covalent/common": "^1.0.0"
+    "@electron-covalent/common": "^1.0.0"
   },
   "peerDependencies": {
     "electron": "*",

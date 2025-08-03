@@ -1,6 +1,6 @@
 import { IpcRendererEvent } from "electron";
 import { BehaviorSubject, Observable, Subject } from "rxjs";
-import { Bridge, CovalentData } from "@covalent/common";
+import { Bridge, CovalentData } from "@electron-covalent/common";
 import { BridgeOpen, CallbackManager, CallbackManagerImpl } from "./callback";
 import { KeysOfType } from "./keys-of-type";
 

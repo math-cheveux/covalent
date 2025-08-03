@@ -1,6 +1,6 @@
 import { BehaviorSubject, first, Subscription } from "rxjs";
 import { contextBridge, ipcMain, IpcMainEvent, IpcMainInvokeEvent, ipcRenderer, webContents } from "electron";
-import { Bridge, CovalentData } from "@covalent/common";
+import { Bridge, CovalentData } from "@electron-covalent/common";
 import { Handler } from "./handler";
 import { CallbackManager } from "./callback";
 import { ReflectUtils } from "./reflect-utils";
