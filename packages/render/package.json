@@ -18,7 +18,7 @@
     "clean": "rimraf ./dist/",
     "build": "tsup",
     "watch": "tsup --watch",
-    "test": "jest"
+    "test": "jest --detectOpenHandles --coverage"
   },
   "dependencies": {
     "@covalent/common": "^1.0.0"

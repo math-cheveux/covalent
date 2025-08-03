@@ -9,12 +9,13 @@
     "wipe": "npm run clean && rimraf node_modules packages/core/node_modules packages/render/node_modules package-lock.json",
     "init": "npm run wipe && npm install",
     "build": "npm run build -w @covalent/common && npm run build -w @covalent/core && npm run build -w @covalent/render",
-    "test": "npm run test -w @covalent/core && npm run test -w @covalent/render",
-    "coverage": "npm run coverage -w @covalent/core && npm run coverage -w @covalent/render",
+    "test:core": "npm run test -w @covalent/core && lcov-result-merger 'packages/**/coverage/lcov.info' > coverage/lcov.info",
+    "test:render": "npm run test -w @covalent/render && lcov-result-merger 'packages/**/coverage/lcov.info' > coverage/lcov.info",
     "release": "npm run build && changeset publish"
   },
   "devDependencies": {
     "@changesets/cli": "^2.29.5",
+    "lcov-result-merger": "^5.0.1",
     "rimraf": "6.0.1"
   }
 }

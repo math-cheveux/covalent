@@ -6,6 +6,7 @@ gen
 
 # compiled output
 dist/
+coverage/
 
 # dependencies
 node_modules/

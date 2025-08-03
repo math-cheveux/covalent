@@ -13,6 +13,10 @@ const config: Config = {
   testEnvironment: "jsdom",
   setupFiles: ["reflect-metadata"], // charge reflect-metadata avant les tests
   moduleFileExtensions: ["ts", "tsx", "js", "json"],
+  collectCoverage: true,
+  collectCoverageFrom: ["src/**/*.{ts,tsx}"],
+  coverageReporters: ["text", "html", "lcov"],
+  coverageDirectory: "coverage",
 };
 
 export default config;
