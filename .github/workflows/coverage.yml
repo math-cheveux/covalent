@@ -1,0 +1,36 @@
+name: Coverage
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  coverage:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Récupère le code
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # 2. Installe Node
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      # 3. Installe toutes les dépendances du monorepo
+      - name: Install dependencies
+        run: npm install
+
+      # 4. Lance les tests avec coverage et merge
+      - name: Run coverage for server
+        run: npm run test:core && npm run test:render
+
+      # 5. Upload à Codecov (si tu veux)
+      - name: Upload to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          files: coverage/lcov.info
+          token: ${{ secrets.CODECOV_TOKEN }} # Pas besoin pour repo public
