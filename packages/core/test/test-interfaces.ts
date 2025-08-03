@@ -2,7 +2,7 @@ import { interval, map, Subject } from "rxjs";
 import { Bridge } from "@covalent/common";
 import { BridgeType, CallbackSubject, Controller, OnInit } from "../src";
 
-type ClickEvent = { buttons: number; x: number; y: number; ctrl: boolean };
+export type ClickEvent = { buttons: number; x: number; y: number; ctrl: boolean };
 
 interface LogBridge {
   info: Bridge.Send<string>;
@@ -59,7 +59,7 @@ export class LogController implements OnInit {
 export class ExampleController {
   constructor(private readonly logController: LogController) {}
 
-  private clickSubject = new Subject<ClickEvent>();
+  public clickSubject = new Subject<ClickEvent>();
 
   public doAction(action: string) {
     this.logController.info(`Doing ${action}.`);

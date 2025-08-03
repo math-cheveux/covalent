@@ -1,5 +1,5 @@
 import { CallbackManager, CallbackPort, CallbackSubject, Controller, Controllers, OnInit, WebContents } from "../src";
-import { ExampleController, LogController } from "./test-interfaces";
+import { ClickEvent, ExampleController, LogController } from "./test-interfaces";
 
 const wc = {
   isDestroyed: jest.fn(() => false),
@@ -236,5 +236,17 @@ describe("electron-side", () => {
     expect(sendSpy).not.toHaveBeenCalled();
     WebContents.send("test", 14, 42);
     expect(sendSpy).toHaveBeenCalledWith("test", 14, 42);
+  });
+
+  test("should broadcast message on next", async () => {
+    await Controllers.register(ExampleController, LogController);
+    const exampleController = await Controllers.get(ExampleController);
+
+    const sendSpy = jest.spyOn(wc, "send");
+
+    expect(sendSpy).not.toHaveBeenCalled();
+    const event: ClickEvent = { buttons: 1, x: 0, y: 0, ctrl: false };
+    exampleController.clickSubject.next(event)
+    expect(sendSpy).toHaveBeenCalledWith("example:onClick", event);
   });
 });
