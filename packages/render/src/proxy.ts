@@ -1,4 +1,4 @@
-import { Bridge, CovalentData } from "@covalent/common";
+import { Bridge } from "@covalent/common";
 import { BridgeOpen, CallbackManager, CallbackManagerImpl } from "./callback";
 import { Bridges } from "./bridges";
 
@@ -13,7 +13,7 @@ export interface ProxySettings<P, B> {
   group: string;
   mirror?: {
     [K in keyof Partial<P>]-?: K extends keyof B
-      ? B[K] extends Bridge.Send<CovalentData> | Bridge.Invoke<CovalentData, CovalentData>
+      ? B[K] extends Bridge.Send<any> | Bridge.Invoke<any, any>
         ? K
         : never
       : never;
@@ -33,12 +33,12 @@ export interface ProxySettings<P, B> {
  */
 export function Proxy<P, B>(settings: ProxySettings<P, B>) {
   return function <T extends new (...args: any[]) => any>(target: T) {
-    if (!Bridges.isBound(settings.group)) {
-      return target;
-    }
     return class extends target {
       constructor(...args: any[]) {
         super(...args);
+        if (!Bridges.isBound(settings.group)) {
+          return;
+        }
         const bridge: B = Bridges.bind(settings.group);
         if (settings.mirror) {
           for (const map of settings.mirror) {

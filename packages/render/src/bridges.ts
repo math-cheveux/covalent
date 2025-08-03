@@ -23,7 +23,10 @@ export type BridgeOfOptions<Output extends CovalentData, Init extends Bridge.Inv
  */
 export abstract class Bridges {
   public static readonly EXPOSE_KEY = "covalent:bridge";
-  private static readonly BRIDGE = window[Bridges.EXPOSE_KEY as keyof Window];
+
+  private static get BRIDGE() {
+    return window[Bridges.EXPOSE_KEY as keyof Window];
+  }
 
   /**
    * @param group the controller group to test
@@ -132,9 +135,9 @@ export abstract class Bridges {
       };
     },
   ): Bridge.Invoke<Input, Output> {
-    const valueMap: Map<Input | undefined, Output> = new Map();
-    const callCount: Map<Input | undefined, number> = new Map();
-    const durationTimeout: Map<Input | undefined, number> = new Map();
+    const valueMap = new Map<Input, Output>();
+    const callCount = new Map<Input, number>();
+    const durationTimeout = new Map<Input, number>();
 
     const fn = async function (data: Input): Promise<Output> {
       // Count calls of the function.
