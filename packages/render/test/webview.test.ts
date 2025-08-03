@@ -45,8 +45,7 @@ describe("browser-side inside electron", () => {
   });
 
   test("should call bridge", () => {
-    // @ts-ignore
-    const infoSpy = jest.spyOn(window[Bridges.EXPOSE_KEY]["log"], "info");
+    const infoSpy = spyBridge("log", "info");
 
     expect(infoSpy).not.toHaveBeenCalled();
     logProxy.info("test");
@@ -54,8 +53,7 @@ describe("browser-side inside electron", () => {
   });
 
   test("should use cache", async () => {
-    // @ts-ignore
-    const configSpy = jest.spyOn(window[Bridges.EXPOSE_KEY]["example"], "getConfig");
+    const configSpy = spyBridge("example", "getConfig");
 
     expect(configSpy).toHaveBeenCalledTimes(0);
     await exampleProxy.getConfiguration();
@@ -65,8 +63,7 @@ describe("browser-side inside electron", () => {
   });
 
   test("should reset cache", async () => {
-    // @ts-ignore
-    const configSpy = jest.spyOn(window[Bridges.EXPOSE_KEY]["example"], "getConfig");
+    const configSpy = spyBridge("example", "getConfig");
 
     expect(configSpy).toHaveBeenCalledTimes(0);
     await exampleProxy.getConfiguration();
@@ -77,8 +74,7 @@ describe("browser-side inside electron", () => {
   });
 
   test("should reset all cache", async () => {
-    // @ts-ignore
-    const configSpy = jest.spyOn(window[Bridges.EXPOSE_KEY]["example"], "getConfig");
+    const configSpy = spyBridge("example", "getConfig");
 
     expect(configSpy).toHaveBeenCalledTimes(0);
     await exampleProxy.getConfiguration();
@@ -89,8 +85,7 @@ describe("browser-side inside electron", () => {
   });
 
   test("should reset cache after X times", async () => {
-    // @ts-ignore
-    const configSpy = jest.spyOn(window[Bridges.EXPOSE_KEY]["example"], "getConfig");
+    const configSpy = spyBridge("example", "getConfig");
     // @ts-ignore
     const configMethod = Bridges.cache(Bridges.bind<ExampleBridge>("example")["getConfig"], {
       invalidate: {
@@ -108,8 +103,7 @@ describe("browser-side inside electron", () => {
   });
 
   test("should reset cache after period", async () => {
-    // @ts-ignore
-    const configSpy = jest.spyOn(window[Bridges.EXPOSE_KEY]["example"], "getConfig");
+    const configSpy = spyBridge("example", "getConfig");
     // @ts-ignore
     const configMethod = Bridges.cache(Bridges.bind<ExampleBridge>("example")["getConfig"], {
       invalidate: {
@@ -129,10 +123,8 @@ describe("browser-side inside electron", () => {
   });
 
   test("should open and close callback", async () => {
-    // @ts-ignore
-    const watchSpy = jest.spyOn(window[Bridges.EXPOSE_KEY]["example"], "watchMetrics");
-    // @ts-ignore
-    const closeSpy = jest.spyOn(window[Bridges.EXPOSE_KEY]["example"], "watchMetrics:__close");
+    const watchSpy = spyBridge("example", "watchMetrics");
+    const closeSpy = spyBridge("example", "watchMetrics:__close");
 
     expect(watchSpy).not.toHaveBeenCalled();
     const obs = await exampleProxy.watch({ period: 200 });
