@@ -33,6 +33,7 @@ export type Provider = {
  */
 export class Controllers {
   private static readonly _controllers = new Map<string, Object>();
+  private static readonly _controllerProviders = new Map<string, Provider>();
   private static readonly _controllersInit = new Map<string, BehaviorSubject<boolean>>();
   private static readonly _controllersSubscriptions: Subscription[] = [];
   public static readonly BRIDGE_METADATA_PREFIX: string = "covalent:bridge:";
@@ -49,7 +50,8 @@ export class Controllers {
     const providers = controllers.map((controller) =>
       typeof controller === "object" ? controller : { provide: controller, useClass: controller },
     );
-    const providerNames = providers.map((provider) => provider.provide.name);
+    const globalProviders: Provider[] = [...providers, ...this._controllerProviders.values()];
+    const providerNames = globalProviders.map((provider) => provider.provide.name);
     // Check self dependencies.
     for (const provider of providers) {
       const depNames = this.getArgTypes(provider.useClass).map((arg) => (typeof arg === "function" ? arg.name : "?"));
@@ -76,7 +78,7 @@ export class Controllers {
     }
     // Check cycle dependencies.
     for (const provider of providers) {
-      const check = this.gatherCycleDependency(providers, provider);
+      const check = this.gatherCycleDependency(globalProviders, provider);
       if (check.length > 0) {
         console.error(`Cycle dependency found: ${check.join(" -> ")}`);
         throw new Error("Error while registering controllers.");
@@ -150,6 +152,7 @@ export class Controllers {
     for (const provider of providers) {
       if (!this._controllers.has(provider.provide.name)) {
         this._controllers.set(provider.provide.name, new provider.useClass());
+        this._controllerProviders.set(provider.provide.name, provider);
         this._controllersInit.set(provider.provide.name, new BehaviorSubject(false));
       }
     }
@@ -252,6 +255,7 @@ export class Controllers {
       }
     }
     this._controllers.clear();
+    this._controllerProviders.clear();
     for (const subject of this._controllersInit.values()) {
       subject.complete();
     }
