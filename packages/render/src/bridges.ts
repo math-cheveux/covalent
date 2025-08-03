@@ -85,14 +85,19 @@ export abstract class Bridges {
 
     Promise.resolve(
       options?.init
-        ? (typeof options.init === "object" ? options.init.invoke(options.init.input) : options.init())
-          .then((value) => subject.next(value))
+        ? this.getOnFirstValue(options.init).then((value) => subject.next(value))
         : null,
     ).finally(() => {
       on((event: Bridge.Event<IpcRendererEvent, Output>) => subject.next(event.value));
     });
 
     return subject.asObservable();
+  }
+
+  private static getOnFirstValue<Output extends CovalentData, Init extends Bridge.Invoke<CovalentData, Output>>(
+    init: Required<BridgeOfOptions<Output, Init>>["init"]
+  ): Promise<Output> {
+    return typeof init === "object" ? init.invoke(init.input) : init()
   }
 
   /**
