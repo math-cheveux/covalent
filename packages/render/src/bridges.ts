@@ -225,8 +225,10 @@ export abstract class Bridges {
       };
     }
 
+    /* istanbul ignore next */
     private constructor() {}
   };
 
+  /* istanbul ignore next */
   private constructor() {}
 }
