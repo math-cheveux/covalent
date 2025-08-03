@@ -131,7 +131,6 @@ describe("electron-side", () => {
     };
 
     const postSpy = jest.spyOn(port, "postMessage");
-    const closeSpy = jest.spyOn(port, "close");
 
     const manager = new CallbackManager<number, number>("test", (subject) => {
       subject.next(400);
@@ -139,8 +138,46 @@ describe("electron-side", () => {
     expect(postSpy).not.toHaveBeenCalled();
     manager.watch(port);
     expect(postSpy).toHaveBeenCalled();
+    manager.unwatch(0);
+  });
+
+  test("should close on watch all", () => {
+    const port: CallbackPort<number, number> = {
+      id: 0,
+      input: 200,
+      postMessage: jest.fn(),
+      close: jest.fn(),
+      onClose: jest.fn(),
+    };
+
+    const closeSpy = jest.spyOn(port, "close");
+
+    const manager = new CallbackManager<number, number>("test", (subject) => {
+      subject.next(400);
+    });
+    manager.watch(port);
     expect(closeSpy).not.toHaveBeenCalled();
     manager.unwatch(0);
+    expect(closeSpy).toHaveBeenCalled();
+  });
+
+  test("should close on unwatch all", () => {
+    const port: CallbackPort<number, number> = {
+      id: 0,
+      input: 200,
+      postMessage: jest.fn(),
+      close: jest.fn(),
+      onClose: jest.fn(),
+    };
+
+    const closeSpy = jest.spyOn(port, "close");
+
+    const manager = new CallbackManager<number, number>("test", (subject) => {
+      subject.next(400);
+    });
+    manager.watch(port);
+    expect(closeSpy).not.toHaveBeenCalled();
+    manager.unwatchAll();
     expect(closeSpy).toHaveBeenCalled();
   });
 
