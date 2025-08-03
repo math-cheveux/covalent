@@ -1,4 +1,4 @@
-import { Controllers } from "../src";
+import { Controller, Controllers } from "../src";
 import { ExampleController, LogController } from "./test-interfaces";
 import * as electron from "electron";
 
@@ -35,4 +35,22 @@ describe("preload script", () => {
       },
     });
   });
+
+  test("should refuse non-controller class", () => {
+    class Test {}
+
+    expect(() => Controllers.exposeBridge(Test)).toThrow();
+  });
+
+  test("should refuse controller with non-unique group", () => {
+    @Controller<TestController, {}>({
+      group: "log",
+      bridge: {},
+      handlers: () => ({}),
+      triggers: () => ({}),
+    })
+    class TestController {}
+
+    expect(() => Controllers.exposeBridge(LogController, TestController)).toThrow();
+  })
 });
