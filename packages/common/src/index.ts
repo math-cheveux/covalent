@@ -8,9 +8,9 @@ export type CovalentData =
   | string
   | Buffer
   | Date
-  | Array<any>
+  | Array<CovalentData>
   | { [key: string]: CovalentData }
-  | Map<any, CovalentData>
+  | Map<CovalentData, CovalentData>
   | Set<CovalentData>
   | Uint8Array
   | Float32Array
