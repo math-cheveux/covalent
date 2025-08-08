@@ -217,3 +217,22 @@ export abstract class Bridges {
   /* istanbul ignore next */
   private constructor() {}
 }
+
+export const bridge = {
+  send : <B, K extends keyof B>(key: K): B[K] extends Bridge.Invoke<any, any> ? never : B[K] extends Bridge.Send<infer Output> ? Bridge.Send<Output> : never => {
+    /*if (!("__covalent:group" in proxy)) {
+      throw new Error("bridge.send should be used ");
+    }*/
+    console.log("send", this, key);
+    return ((data: any) => {}) as any;
+  },
+  invoke<B, K extends keyof B>(key: K): B[K] extends Bridge.Invoke<infer Input, infer Output> ? Bridge.Invoke<Input, Output> : never {
+    throw new Error("not implemented");
+  },
+  of<B, K extends keyof B>(key: K): B[K] extends Bridge.On<infer Output> ? Observable<Output> : never {
+    throw new Error("not implemented");
+  },
+  open<B, K extends keyof B>(key: K): B[K] extends Bridge.Callback<infer Input, infer Output> ? BridgeOpen<Bridge.Callback<Input, Output>> : never {
+    throw new Error("not implemented");
+  },
+};
