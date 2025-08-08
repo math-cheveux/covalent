@@ -34,8 +34,12 @@ export interface ProxySettings<P, B> {
 export function Proxy<P, B>(settings: ProxySettings<P, B>) {
   return function <T extends new (...args: any[]) => any>(target: T) {
     return class extends target {
+      static "__covalent:group" = settings.group;
+
       constructor(...args: any[]) {
+        console.log("before super", target.name);
         super(...args);
+        console.log("after super", target.name);
         if (!Bridges.isBound(settings.group)) {
           return;
         }

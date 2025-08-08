@@ -1,6 +1,6 @@
 import { EMPTY, interval, map } from "rxjs";
 import { Bridge } from "@electron-covalent/common";
-import { BridgeOf, BridgeOpen, Bridges, Proxy } from "../src";
+import { bridge, BridgeOf, BridgeOpen, Bridges, Proxy } from "../src";
 
 type ClickEvent = { buttons: number; x: number; y: number; ctrl: boolean };
 
@@ -51,3 +51,11 @@ export class ExampleProxy {
     Bridges.invalidateCache(this.getConfiguration);
   }
 }
+
+@Proxy<NewExampleProxy, ExampleBridge>({ group: "example" })
+export class NewExampleProxy {
+  public readonly doAction = bridge.send<ExampleBridge, "doAction">("doAction");
+}
+
+const proxy = new NewExampleProxy();
+proxy.doAction("");
