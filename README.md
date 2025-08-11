@@ -201,7 +201,7 @@ To install Covalent in your frontend project, run the following command:
 npm i @electron-covalent/render
 ```
 
-## Definition
+## Definition with the decorator
 
 To define a proxy, just add the `Proxy` decorator on an Angular service (or a simple class if it is not an Angular
 project).
@@ -274,3 +274,29 @@ This method will ask the closure of the `CALLBACK` in the core process (cf. `CAL
 _Note_: it is still possible to don't use the `Proxy` decorator thanks to the `Bridges.bind` method, since that the
 decorator is just an easy, secured and automatized way to expose the bridge.
 It is recommended to use this function only in specific situations (example: generic proxy).
+
+## Definition with functions
+
+```typescript
+import { interval, map } from "rxjs";
+import { invoke, Proxy, on, open, send } from "@electron-covalent/render";
+
+@Injectable() // Angular services decorator.
+@Proxy({ group: "example" })
+export class ExampleProxy {
+  public readonly doAction = send<ExampleBridge>(this, "doAction");
+  public readonly getConfiguration = invoke.cache<ExampleBridge>(this, "getConfig", { defaultValue: { url: "/" } });
+  public readonly calculate = invoke<ExampleBridge>(this, "calculate", { defaultValue: NaN });
+  public readonly date$ = on<ExampleBridge>(this, "onDate", { defaultObservable: interval(250).pipe(map(() => new Date())) });
+  public readonly click$ = on<ExampleBridge>(this, "onClick");
+  public readonly watch = open<ExampleBridge>(this, "watchMetrics", { defaultValue: { percentCpuUsage: NaN } });
+
+  // If invoke.cache is used for getConfiguration.
+  public resetConfig(): void {
+    Bridges.invalidateCache(this.getConfiguration);
+  }
+}
+```
+
+These functions are a more concise way to declare a proxy, but they can be used only directly on the class attributes
+(not even in the constructor).
