@@ -32,7 +32,7 @@ export class LogProxy {
   mirror: ["doAction", "calculate", "getDate", "getMetrics"],
   map: (bridge) => ({
     getConfiguration: Bridges.cache(bridge.getConfig),
-    date$: Bridges.of(bridge.onDate, { init: bridge.getDate }),
+    date$: Bridges.of(bridge.onDate, { defaultValue: new Date(), init: bridge.getDate() }),
     click$: Bridges.of(bridge.onClick),
     watch: Bridges.open(bridge, "watchMetrics"),
   }),
@@ -45,7 +45,7 @@ export class ExampleProxy {
   public readonly date$: BridgeOf<ExampleBridge["onDate"]> = interval(250).pipe(map(() => new Date()));
   public readonly click$: BridgeOf<ExampleBridge["onClick"]> = EMPTY;
   public readonly getMetrics: ExampleBridge["getMetrics"] = Bridges.Default.Invoke({ percentCpuUsage: NaN });
-  public readonly watch: BridgeOpen<ExampleBridge["watchMetrics"]> = Bridges.Default.Callback({ percentCpuUsage: NaN });
+  public readonly watch: BridgeOpen<ExampleBridge["watchMetrics"]> = Bridges.Default.Callback({ value: { percentCpuUsage: NaN }});
 
   public resetConfig(): void {
     Bridges.invalidateCache(this.getConfiguration);

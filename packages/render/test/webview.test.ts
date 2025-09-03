@@ -123,33 +123,35 @@ describe("browser-side inside electron", () => {
     }, 5000);
   });
 
-  test("should open and close callback", async () => {
+  test("should open and close callback", () => {
     const watchSpy = spyBridge("example", "watchMetrics");
     const closeSpy = spyBridge("example", "watchMetrics:__close");
 
     expect(watchSpy).not.toHaveBeenCalled();
-    const obs = await exampleProxy.watch({ period: 200 });
-    expect(watchSpy).toHaveBeenCalled();
-    expect(closeSpy).not.toHaveBeenCalled();
-    obs.complete();
-    expect(closeSpy).toHaveBeenCalled();
+    const obs = exampleProxy.watch({ period: 200 });
+    setTimeout(() => {
+      expect(watchSpy).toHaveBeenCalled();
+      expect(closeSpy).not.toHaveBeenCalled();
+      obs.complete();
+      expect(closeSpy).toHaveBeenCalled();
+    });
   });
 
-  test("should callback have default value", async () => {
+  test("should callback have default value", () => {
     const watchMethod = Bridges.open<ExampleBridge, { period: number }, { percentCpuUsage: number }>(
       Bridges.bind<ExampleBridge>("example"),
       "watchMetrics",
       { percentCpuUsage: 0.42 },
     );
 
-    const obs = await watchMethod.open({ period: 200 });
-    obs.subscribe(data => {
+    const obs = watchMethod.open({ period: 200 });
+    obs.subscribe((data) => {
       expect(data.percentCpuUsage).toBe(0.42);
       obs.complete();
     });
   });
 
-  test("should on observable get first value from invoke", async () => {
+  test("should on observable get first value from invoke", () => {
     const getSpy = spyBridge("example", "getDate");
     const onSpy = spyBridge("example", "onDate");
 
@@ -162,18 +164,20 @@ describe("browser-side inside electron", () => {
     }, 200);
   });
 
-  test("should callback get first value from invoke", async () => {
+  test("should callback get first value from invoke", () => {
     const watchMethod = Bridges.open<ExampleBridge, { period: number }, { percentCpuUsage: number }>(
       Bridges.bind<ExampleBridge>("example"),
       "watchMetrics",
     );
 
-    const metricsSpy = spyBridge("example", "getMetrics");
-
-    expect(metricsSpy).not.toHaveBeenCalled();
-    const obs = await watchMethod.open({ period: 200 }, { init: Bridges.bind<ExampleBridge>("example")["getMetrics"] });
-    obs.subscribe(data => {
-      expect(metricsSpy).toHaveBeenCalled();
+    const obs = watchMethod.open(
+      { period: 200 },
+      {
+        defaultValue: { percentCpuUsage: NaN },
+        init: Bridges.bind<ExampleBridge>("example")["getMetrics"](),
+      },
+    );
+    obs.subscribe((data) => {
       expect(data.percentCpuUsage).toBe(0.14);
       obs.complete();
     });

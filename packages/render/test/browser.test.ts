@@ -1,6 +1,7 @@
 import { Bridge } from "@electron-covalent/common";
 import { Bridges } from "../src";
 import { ExampleProxy, LogProxy } from "./test-interfaces";
+import { BehaviorSubject } from "rxjs";
 
 describe("browser-side without electron", () => {
   // @ts-ignore
@@ -24,7 +25,7 @@ describe("browser-side without electron", () => {
     expect(() => exampleProxy.doAction("test")).not.toThrow();
     await expect(exampleProxy.getConfiguration()).resolves.not.toThrow();
     await expect(exampleProxy.calculate({ x: 0 })).resolves.not.toThrow();
-    await expect(exampleProxy.watch({ period: 100 })).resolves.not.toThrow();
+    expect(() => exampleProxy.watch({ period: 100 })).not.toThrow();
   });
 
   test("should have default behavior", async () => {
@@ -54,5 +55,21 @@ describe("browser-side without electron", () => {
     expect(callbackSpy).not.toHaveBeenCalled();
     bridge.testCallback(() => {}, "test");
     expect(callbackSpy).toHaveBeenCalled();
+  });
+
+  test("", () => {
+    const obj = {
+      test(arg: string) {},
+    };
+
+    const spy = jest.spyOn(obj, "test");
+
+    const subject = new BehaviorSubject<string>("");
+    subject.next("BRAVO");
+
+    subject.subscribe(obj.test);
+
+    expect(spy).toHaveBeenCalledTimes(1);
+    expect(spy).toHaveBeenCalledWith("BRAVO");
   });
 });

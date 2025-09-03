@@ -9,13 +9,19 @@ import { KeysOfType } from "./keys-of-type";
  */
 export type BridgeOf<On> = On extends Bridge.On<infer Output> ? Observable<Output> : never;
 
-export type BridgeOfOptions<Output extends CovalentData, Init extends Bridge.Invoke<CovalentData, Output>> = {
-  defaultValue?: Output;
-  init?: Init extends Bridge.Invoke<infer InitInput, Output>
-    ? InitInput extends void
-      ? Init
-      : { invoke: Init; input: InitInput }
-    : never;
+/**
+ * Options of the method <code>Bridges.of</code>.
+ * @see Bridges.of
+ */
+export type BridgeOfOptions<Output extends CovalentData> = {
+  /**
+   * Will define the first value of the bridge observable. Note that the underlying subject will become a BehaviorSubject.
+   */
+  defaultValue: Output;
+  /**
+   * Will define a second value of the bridge observable asynchronously.
+   */
+  init?: PromiseLike<Output>;
 };
 
 /**
@@ -71,33 +77,20 @@ export abstract class Bridges {
 
   /**
    * @param on the bridge endpoint
-   * @param options the returned observable parameters
+   * @param options the returned observable parameters.
    * @return an observable bound to the passed `ON` endpoint
    */
-  public static of<Output extends CovalentData, Init extends Bridge.Invoke<any, Output>>(
+  public static of<Output extends CovalentData>(
     on: Bridge.On<Output>,
-    options?: BridgeOfOptions<Output, Init>,
-  ): BridgeOf<Bridge.On<Output>> {
-    const subject =
-      options?.defaultValue != undefined
-        ? new BehaviorSubject<Output>(options.defaultValue)
-        : new Subject<Output>();
+    options?: BridgeOfOptions<Output>,
+  ): Observable<Output> {
+    const subject = options ? new BehaviorSubject<Output>(options.defaultValue) : new Subject<Output>();
 
-    Promise.resolve(
-      options?.init
-        ? this.getOnFirstValue(options.init).then((value) => subject.next(value))
-        : null,
-    ).finally(() => {
-      on((event: Bridge.Event<IpcRendererEvent, Output>) => subject.next(event.value));
-    });
+    Promise.resolve(options?.init?.then((value) => subject.next(value))).finally(() =>
+      on((event: Bridge.Event<IpcRendererEvent, Output>) => subject.next(event.value)),
+    );
 
     return subject.asObservable();
-  }
-
-  private static getOnFirstValue<Output extends CovalentData, Init extends Bridge.Invoke<CovalentData, Output>>(
-    init: Required<BridgeOfOptions<Output, Init>>["init"]
-  ): Promise<Output> {
-    return typeof init === "object" ? init.invoke(init.input) : init()
   }
 
   /**
@@ -118,10 +111,7 @@ export abstract class Bridges {
     return new CallbackManagerImpl<B, Input, Output>(bridge, callbackKey, defaultValue);
   }
 
-  private static readonly CACHE_MAP: Map<
-    Bridge.Invoke<any, any>,
-    Map<unknown, unknown>
-  > = new Map();
+  private static readonly CACHE_MAP: Map<Bridge.Invoke<any, any>, Map<unknown, unknown>> = new Map();
 
   /**
    * Override an `INVOKE` function to implement a stored-value logic.
@@ -147,10 +137,7 @@ export abstract class Bridges {
     const fn = async function (data: Input): Promise<Output> {
       // Count calls of the function.
       callCount.set(data, (callCount.get(data) ?? 0) + 1);
-      if (
-        options?.invalidate?.callCount != undefined &&
-        callCount.get(data)! >= options.invalidate.callCount
-      ) {
+      if (options?.invalidate?.callCount != undefined && callCount.get(data)! >= options.invalidate.callCount) {
         valueMap.delete(data);
       }
       let value: Output;
@@ -218,10 +205,10 @@ export abstract class Bridges {
     }
 
     public static Callback<Input extends CovalentData, Output extends CovalentData>(
-      value?: Output,
+      options?: { value: Output },
     ): BridgeOpen<Bridge.Callback<Input, Output>> {
       return () => {
-        return Promise.resolve(value !== undefined ? new BehaviorSubject<Output>(value) : new Subject<Output>());
+        return options ? new BehaviorSubject<Output>(options.value) : new Subject<Output>();
       };
     }
 
