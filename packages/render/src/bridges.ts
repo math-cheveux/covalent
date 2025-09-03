@@ -100,15 +100,13 @@ export abstract class Bridges {
    *
    * @param bridge the proxy bridge
    * @param callbackKey the `CALLBACK` endpoint key in the bridge
-   * @param defaultValue the default value of the observables that will be created
    * @return the callback manager instance
    */
   public static open<B, Input extends CovalentData, Output extends CovalentData>(
     bridge: B,
     callbackKey: Extract<KeysOfType<B, Bridge.Callback<Input, Output>>, string>,
-    defaultValue?: Output,
   ): CallbackManager<Input, Output> {
-    return new CallbackManagerImpl<B, Input, Output>(bridge, callbackKey, defaultValue);
+    return new CallbackManagerImpl<B, Input, Output>(bridge, callbackKey);
   }
 
   private static readonly CACHE_MAP: Map<Bridge.Invoke<any, any>, Map<unknown, unknown>> = new Map();

@@ -141,10 +141,9 @@ describe("browser-side inside electron", () => {
     const watchMethod = Bridges.open<ExampleBridge, { period: number }, { percentCpuUsage: number }>(
       Bridges.bind<ExampleBridge>("example"),
       "watchMetrics",
-      { percentCpuUsage: 0.42 },
     );
 
-    const obs = watchMethod.open({ period: 200 });
+    const obs = watchMethod.open({ period: 200 }, { defaultValue: { percentCpuUsage: 0.42 } });
     obs.subscribe((data) => {
       expect(data.percentCpuUsage).toBe(0.42);
       obs.complete();

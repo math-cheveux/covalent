@@ -35,7 +35,6 @@ export class CallbackManagerImpl<B, Input extends CovalentData, Output extends C
   public constructor(
     private readonly bridge: B,
     private readonly callbackKey: Extract<KeysOfType<B, Bridge.Callback<Input, Output>>, string>,
-    private readonly defaultValue?: Output,
   ) {}
 
   private get callback(): Bridge.Callback<Input, Output> {
