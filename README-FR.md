@@ -121,21 +121,25 @@ import { BridgeType, CallbackSubject, Controller } from "@electron-covalent/core
   })
 })
 export class ExampleController {
-  constructor(private readonly anotherController: AnotherController, ...) {
+  constructor(private readonly anotherController: AnotherController /*...*/) {
   }
 
   private clickSubject = new Subject<ClickEvent>();
 
-  private doAction(action: string) { ...
+  private doAction(action: string) {
+    // ...
   }
 
-  public get config(): { url: string } { ...
+  public get config(): { url: string } {
+    // ...
   }
 
-  private calculate(params: { x: number }): number { ...
+  private calculate(params: { x: number }): number {
+    // ...
   }
 
-  public startWatchingMetrics(subject: CallbackSubject<{ percentCpuUsage: number }>, input: { period: number }) { ...
+  public startWatchingMetrics(subject: CallbackSubject<{ percentCpuUsage: number }>, input: { period: number }) {
+    // ...
   }
 }
 ```
@@ -158,7 +162,7 @@ Dans le script de lancement d'Electron, il faut appeler la méthode `Controllers
 paramètre :
 
 ```typescript
-Controllers.register(..., ExampleController, ...);
+Controllers.register(/*...*/ ExampleController /*...*/);
 ```
 
 Cette méthode instancie les contrôleurs.
@@ -186,7 +190,7 @@ Dans le script de preload des processus de rendu, il faut appeler la méthode `C
 contrôleurs en paramètre :
 
 ```typescript
-Controllers.exposeBridge(..., ExampleController, ...);
+Controllers.exposeBridge(/*...*/ ExampleController /*...*/);
 ```
 
 # Utilisation côté rendu
@@ -231,7 +235,7 @@ export class ExampleProxy {
   public readonly click$: BridgeOf<ExampleBridge["onClick"]>
     = EMPTY;
   public readonly watch: BridgeOpen<ExampleBridge["watchMetrics"]>
-    = Bridges.Default.Callback({ percentCpuUsage: NaN });
+    = Bridges.Default.Callback({ value: { percentCpuUsage: NaN } });
 
   // Si Bridges.cache est utilisé pour getConfiguration.
   public resetConfig(): void {
